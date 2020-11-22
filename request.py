@@ -17,12 +17,17 @@ test_set = [
     {'bs': '1024', 'start': '768', 'end': '1024', 'case': '4'},
 ]
 
+test_set2 = [
+    {'bs': '1024', 'start': '0', 'end': '512', 'case': '1'},
+    {'bs': '1024', 'start': '512', 'end': '1024', 'case': '2'}
+]
+
 threads_1 = []
 #
 # for obj in test_set:
 #     requester(obj['bs'], obj['start'], obj['end'], obj['case'])
 
-for obj in test_set:
+for obj in test_set2:
     t = Thread(target=requester, args=(obj['bs'], obj['start'], obj['end'], obj['case']))
     t.start()
     threads_1.append(t)
