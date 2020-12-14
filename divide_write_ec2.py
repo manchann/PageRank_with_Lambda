@@ -35,8 +35,12 @@ test_set = [
 ]
 
 test_set2 = [
-    {'bs': '1024', 'start': '0', 'end': '512', 'case': '1'},
-    {'bs': '1024', 'start': '512', 'end': '1024', 'case': '2'}
+    {'bs': '1', 'start': '0', 'end': '50', 'case': '1'},
+    {'bs': '1', 'start': '50', 'end': '100', 'case': '2'}
+]
+
+test_init = [
+    {'bs': '1', 'start': '0', 'end': '100', 'case': '0'}
 ]
 
 test_set3 = [
@@ -53,11 +57,11 @@ test_set3 = [
 threads_1 = []
 for obj in test_set2:
     t = Thread(target=requester, args=({
-        'bs': obj['bs'],
-        'start': obj['start'],
-        'end': obj['end'],
-        'case': obj['case'],
-    },0))
+                                           'bs': obj['bs'],
+                                           'start': obj['start'],
+                                           'end': obj['end'],
+                                           'case': obj['case'],
+                                       }, 0))
     t.start()
     threads_1.append(t)
 for t in threads_1:
