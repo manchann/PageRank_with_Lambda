@@ -4,7 +4,7 @@ file_size = 100
 byte_size = 1
 
 output_arr = []
-with open(file_read_path, 'rb', 0) as f:
+with open(file_read_path, 'rb') as f:
     for _ in range(int(file_size / byte_size)):
         read_byte = f.read(byte_size)
         output_arr.append(read_byte)
