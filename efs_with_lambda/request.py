@@ -10,16 +10,22 @@ def requester(bs, start, end, case):
         shell=True)
 
 
-test_set = [
-    {'bs': '1024', 'start': '0', 'end': '256', 'case': '1'},
-    {'bs': '1024', 'start': '256', 'end': '512', 'case': '2'},
-    {'bs': '1024', 'start': '512', 'end': '768', 'case': '3'},
-    {'bs': '1024', 'start': '768', 'end': '1024', 'case': '4'},
+test_set2 = [
+    {'bs': '1', 'start': '0', 'end': '50', 'case': '1'},
+    {'bs': '1', 'start': '50', 'end': '100', 'case': '2'}
 ]
 
-test_set2 = [
-    {'bs': '1024', 'start': '0', 'end': '512', 'case': '1'},
-    {'bs': '1024', 'start': '512', 'end': '1024', 'case': '2'}
+test_set4 = [
+    {'bs': '1', 'start': '0', 'end': '10', 'case': '0'},
+    {'bs': '1', 'start': '10', 'end': '20', 'case': '1'},
+    {'bs': '1', 'start': '20', 'end': '30', 'case': '2'},
+    {'bs': '1', 'start': '30', 'end': '40', 'case': '3'},
+    {'bs': '1', 'start': '40', 'end': '50', 'case': '4'},
+    {'bs': '1', 'start': '50', 'end': '60', 'case': '5'},
+    {'bs': '1', 'start': '60', 'end': '70', 'case': '6'},
+    {'bs': '1', 'start': '70', 'end': '80', 'case': '7'},
+    {'bs': '1', 'start': '80', 'end': '90', 'case': '8'},
+    {'bs': '1', 'start': '90', 'end': '100', 'case': '9'},
 ]
 
 threads_1 = []
@@ -27,7 +33,7 @@ threads_1 = []
 # for obj in test_set:
 #     requester(obj['bs'], obj['start'], obj['end'], obj['case'])
 
-for obj in test_set2:
+for obj in test_set4:
     t = Thread(target=requester, args=(obj['bs'], obj['start'], obj['end'], obj['case']))
     t.start()
     threads_1.append(t)

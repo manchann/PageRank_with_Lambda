@@ -8,7 +8,7 @@ def lambda_handler(event, context):
     start_byte = int(event['start'])
     end_byte = int(event['end'])
 
-    file_write_path = mnt_test + 'read_file'
+    file_write_path =mnt_test + 'read_file'
     arr = []
     with open(file_write_path, 'r+b', 0) as f:
         for idx in range(start_byte, end_byte):
