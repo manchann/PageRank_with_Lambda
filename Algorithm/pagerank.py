@@ -9,7 +9,6 @@ def display_format(my_vector, my_decimal):
 
 
 my_dp = Fraction(1, 3)
-print(my_dp)
 Mat = np.matrix(
     [[0, 0, 1],
      [Fraction(1, 2), 0, 0],
@@ -17,7 +16,7 @@ Mat = np.matrix(
 )
 Ex = np.zeros((3, 3))
 Ex[:] = my_dp
-beta = 0.7
+beta = 0.9
 Al = beta * Mat + ((1 - beta) * Ex)
 r = np.matrix([my_dp, my_dp, my_dp])
 r = np.transpose(r)
