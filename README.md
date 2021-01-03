@@ -1,1 +1,1 @@
-# PageRank_with_Lambda
+# File을 byte 단위로 접근할 때 Storage의 종류에 따라서 어떤 결과값이 나오는 지 실험합니다.
