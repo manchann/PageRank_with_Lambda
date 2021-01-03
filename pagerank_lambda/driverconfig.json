@@ -1,0 +1,16 @@
+{
+  "bucket": "jg-pagerank-bucket",
+  "prefix": "/",
+  "pages": "pages.txt",
+  "jobBucket": "jg-pagerank-bucket",
+  "region": "us-east-1",
+  "lambdaMemory": 512,
+  "concurrentLambdas": 1000,
+  "lambda_read_timeout": 300,
+  "boto_max_connections": 1000,
+  "lambda": {
+    "name": "pagerank.py",
+    "handler": "pagerank.lambda_handler",
+    "zip": "pagerank.zip"
+  }
+}
