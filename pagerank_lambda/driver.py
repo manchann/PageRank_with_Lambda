@@ -17,6 +17,8 @@ lambda_read_timeout = config["lambda_read_timeout"]
 boto_max_connections = config["boto_max_connections"]
 lambda_name = config["lambda"]["name"]
 lambda_zip = config["lambda"]["zip"]
+print(bucket)
+print(config["pages"])
 pages = s3_client.get_object(Bucket=bucket, Key=config["pages"])
 
 lambda_config = Config(read_timeout=lambda_read_timeout, max_pool_connections=boto_max_connections)
@@ -25,8 +27,8 @@ lambda_client = boto3.client('lambda', config=lambda_config)
 iters = 50
 
 
-def write_to_s3(bucket, key, data, metadata):
-    s3.Bucket(bucket).put_object(Key=key, Body=data, Metadata=metadata)
+def write_to_s3(bucket, key):
+    s3.Bucket(bucket).put_object(Key=key,Body=)
 
 
 def zipLambda(fname, zipname):
@@ -52,14 +54,15 @@ def invoke_lambda(page, page_relations, iter):
 
 def get_page_relation(pages):
     page_relations = {}
-    with open(pages, 'r') as f:
-        lines = f.readlines()
-        for line in lines:
-            key = line.split(" ")[0]
-            value = line.split(" ")[1]
-            if key not in page_relations:
-                page_relations[key] = []
-            page_relations[key].append(value)
+    pages = pages['Body'].read().decode()
+    lines = pages.split("\n")
+    for line in lines:
+        key = line.split(" ")[0]
+        value = line.split(" ")[1]
+        if key not in page_relations:
+            page_relations[key] = []
+        page_relations[key].append(value)
+
     return page_relations
 
 
@@ -71,12 +74,14 @@ print(page_relations)
 
 file_read_path = '0.txt'
 pagerank_init = 1 / len(page_relations)
-with open(file_read_path, 'r+b', 0) as f:
+byte = 1024
+with open(file_read_path, 'w+b', 0) as f:
     for page in page_relations:
-        f.seek(int(page))
+        f.seek(int(page) * byte)
         f.write(str(pagerank_init).encode())
+write_to_s3(bucket, file_read_path)
 
-for iter in range(1, iters + 1):
-    for page in page_relations:
-        invoke_lambda(page, page_relations[page], iter)
-        break
+# for iter in range(1, iters + 1):
+#     for page in page_relations:
+#         invoke_lambda(page, page_relations[page], iter)
+#         break

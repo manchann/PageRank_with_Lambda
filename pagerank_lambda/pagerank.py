@@ -9,8 +9,8 @@ s3_client = boto3.client('s3')
 
 
 # 주어진 bucket 위치 경로에 파일 이름이 key인 object와 data를 저장합니다.
-def write_to_s3(bucket, key, data, metadata):
-    s3.Bucket(bucket).put_object(Key=key, Body=data, Metadata=metadata)
+def write_to_s3(bucket, key):
+    s3.Bucket(bucket).put_object(Key=key)
 
 
 def lambda_handler(event, context):
