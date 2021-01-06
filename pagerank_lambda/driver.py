@@ -27,8 +27,8 @@ lambda_client = boto3.client('lambda', config=lambda_config)
 iters = 50
 
 
-def write_to_s3(bucket, key):
-    s3.Bucket(bucket).put_object(Key=key,Body=)
+def write_to_s3(bucket, key, data):
+    s3.Bucket(bucket).put_object(Key=key, Body=data)
 
 
 def zipLambda(fname, zipname):
@@ -79,7 +79,7 @@ with open(file_read_path, 'w+b', 0) as f:
     for page in page_relations:
         f.seek(int(page) * byte)
         f.write(str(pagerank_init).encode())
-write_to_s3(bucket, file_read_path)
+write_to_s3(bucket, file_read_path, open('./0.txt', 'rb'))
 
 # for iter in range(1, iters + 1):
 #     for page in page_relations:
