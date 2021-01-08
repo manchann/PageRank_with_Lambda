@@ -2,6 +2,7 @@ import json
 import boto3
 import glob
 import subprocess
+import lambdautils
 from botocore.client import Config
 
 s3 = boto3.resource('s3')
@@ -67,7 +68,9 @@ def get_page_relation(pages):
 
 
 zipLambda(lambda_name, lambda_zip)
-
+l_pagerank = lambdautils.LambdaManager(lambda_client, s3_client, region, config["lambda"]["zip"],
+                                       lambda_name, config["lambda"]["handler"])
+l_pagerank.update_code_or_create_on_noexist()
 page_relations = get_page_relation(pages)
 
 print(page_relations)
@@ -81,7 +84,9 @@ with open(file_read_path, 'w+b', 0) as f:
         f.write(str(pagerank_init).encode())
 write_to_s3(bucket, file_read_path, open('./0.txt', 'rb'))
 
-# for iter in range(1, iters + 1):
-#     for page in page_relations:
-#         invoke_lambda(page, page_relations[page], iter)
-#         break
+progress = '/progress'
+
+for iter in range(1, iters + 1):
+    for page in page_relations:
+        invoke_lambda(page, page_relations[page], iter)
+        break

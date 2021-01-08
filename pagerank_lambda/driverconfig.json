@@ -9,7 +9,7 @@
   "lambda_read_timeout": 300,
   "boto_max_connections": 1000,
   "lambda": {
-    "name": "pagerank.py",
+    "name": "pagerank",
     "handler": "pagerank.lambda_handler",
     "zip": "pagerank.zip"
   }

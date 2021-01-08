@@ -3,7 +3,7 @@ import time
 from threading import Thread
 
 efs_path = '/mnt/efs/fs1/'
-local_path = '/'
+local_path = './'
 
 test_path = local_path
 

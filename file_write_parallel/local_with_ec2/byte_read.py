@@ -1,4 +1,4 @@
-file_read_path = 'read_file'
+file_read_path = '../python/read_file'
 
 file_size = 100
 byte_size = 1

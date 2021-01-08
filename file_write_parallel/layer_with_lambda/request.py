@@ -5,7 +5,7 @@ from threading import Thread
 
 def requester(bs, start, end, case):
     subprocess.check_call(
-        "\curl 'https://yq7pnajel1.execute-api.us-east-1.amazonaws.com/first/?bs=%22'{}'%22&start=%22'{}'%22&end=%22'{}'%22&case=%22'{}'%22#'".format(
+        "\curl 'https://a6o7mwk0ob.execute-api.us-west-2.amazonaws.com/first/?bs=%22'{}'%22&start=%22'{}'%22&end=%22'{}'%22&case=%22'{}'%22#'".format(
             bs, start, end, case),
         shell=True)
 

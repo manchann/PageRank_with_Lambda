@@ -3,9 +3,9 @@ import time
 from threading import Thread
 
 efs_path = '/mnt/efs/fs1/'
-local_path = '../../'
+local_path = '/'
 
-test_path = efs_path
+test_path = local_path
 
 
 def requester(event, context):
@@ -15,7 +15,7 @@ def requester(event, context):
 
     file_write_path = test_path + 'read_file'
     arr = []
-    with open(file_write_path, 'wb', 0) as f:
+    with open(file_write_path, 'w+b', 0) as f:
         for idx in range(start_byte, end_byte):
             arr.append(idx)
             f.seek(byte_size * idx)

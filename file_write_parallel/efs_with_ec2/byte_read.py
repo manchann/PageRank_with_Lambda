@@ -1,4 +1,4 @@
-efs_path = '/mnt/efs/fs1/ap/'
+efs_path = '/mnt/efs/fs1/'
 
 file_read_path = efs_path + 'read_file'
 

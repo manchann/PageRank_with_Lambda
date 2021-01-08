@@ -13,6 +13,9 @@ def write_to_s3(bucket, key):
     s3.Bucket(bucket).put_object(Key=key)
 
 
+def ranking(page):
+
+
 def lambda_handler(event, context):
     bucket = event['bucket']
     page = event['page']
@@ -20,4 +23,5 @@ def lambda_handler(event, context):
     file_read_path = str(event['iter']) + '.txt'
     with open(file_read_path, 'r+b', 0) as f:
         f.seek(int(page))
-        f.write(page_rank.encode())
+        page_rank = ranking(page)
+        f.write(page_rank)

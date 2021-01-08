@@ -2,7 +2,7 @@ import subprocess
 import time
 from threading import Thread
 
-efs_path = '/mnt/efs/fs1/ap/'
+efs_path = '/mnt/efs/fs1/'
 local_path = '/'
 
 test_path = efs_path
@@ -39,8 +39,21 @@ test_set4 = [
     {'bs': '1', 'start': '75', 'end': '100', 'case': '4'}
 ]
 
+test_set10 = [
+    {'bs': '1', 'start': '0', 'end': '10', 'case': '0'},
+    {'bs': '1', 'start': '10', 'end': '20', 'case': '1'},
+    {'bs': '1', 'start': '20', 'end': '30', 'case': '2'},
+    {'bs': '1', 'start': '30', 'end': '40', 'case': '3'},
+    {'bs': '1', 'start': '40', 'end': '50', 'case': '4'},
+    {'bs': '1', 'start': '50', 'end': '60', 'case': '5'},
+    {'bs': '1', 'start': '60', 'end': '70', 'case': '6'},
+    {'bs': '1', 'start': '70', 'end': '80', 'case': '7'},
+    {'bs': '1', 'start': '80', 'end': '90', 'case': '8'},
+    {'bs': '1', 'start': '90', 'end': '100', 'case': '9'},
+]
+
 threads_1 = []
-for obj in test_set4:
+for obj in test_set10:
     t = Thread(target=requester, args=({
                                            'bs': obj['bs'],
                                            'start': obj['start'],
