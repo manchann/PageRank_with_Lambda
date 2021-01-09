@@ -2,7 +2,7 @@ import subprocess
 import time
 from threading import Thread
 
-efs_path = '/mnt/efs/fs1/'
+efs_path = '/mnt/efs/ap/'
 local_path = '../../'
 
 test_path = efs_path
@@ -21,6 +21,11 @@ def requester(event, context):
             f.seek(byte_size * idx)
             f.write(str(event['case']).encode())
         f.close()
+
+    # lambda 실험시 read_file 권한 관련
+    subprocess.call(["chmod", "755", efs_path + "read_file"])
+    subprocess.call(["chown", "1001:1001", efs_path + "read_file"])
+
     return {
         'start_byte': start_byte,
         'end_byte': end_byte,

@@ -2,7 +2,7 @@ import subprocess
 import time
 from threading import Thread
 
-efs_path = '/mnt/efs/fs1/'
+efs_path = '/mnt/efs/ap/'
 local_path = '/'
 
 test_path = efs_path
