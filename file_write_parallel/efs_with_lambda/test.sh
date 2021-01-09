@@ -9,6 +9,8 @@ aws lambda update-function-configuration --function-name $function_name --memory
 sleep 5
 python3 ./init.py
 sleep 5
+python3 ./request_first.py
+sleep 5
 python3 ./request.py
 sleep 5
 python3 ./byte_read.py
