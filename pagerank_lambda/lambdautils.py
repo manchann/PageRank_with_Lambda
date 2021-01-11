@@ -6,7 +6,7 @@ import os
 class LambdaManager(object):
     def __init__(self, l, s3, region, codepath, fname, handler, lmem=1024):
         self.awslambda = l
-        self.region = "us-east-1" if region is None else region
+        self.region = "us-west-2" if region is None else region
         self.s3 = s3
         self.codefile = codepath
         self.function_name = fname

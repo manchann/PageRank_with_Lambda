@@ -3,7 +3,7 @@
   "prefix": "/",
   "pages": "pages.txt",
   "jobBucket": "jg-pagerank-bucket",
-  "region": "us-east-1",
+  "region": "us-west-2",
   "lambdaMemory": 512,
   "concurrentLambdas": 1000,
   "lambda_read_timeout": 300,
