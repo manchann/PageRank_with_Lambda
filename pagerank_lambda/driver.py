@@ -92,14 +92,14 @@ l_pagerank.update_code_or_create_on_noexist()
 page_relations = get_page_relation(pages)
 
 print(page_relations)
-pagerank_init = decimal.Decimal(1) / decimal.Decimal(len(page_relations))
+pagerank_init = 1 / len(page_relations)
 page_nodes = []
 for page in page_relations:
     table.put_item(
         Item={
             'iter': 0,
             'page': page,
-            'rank': decimal.Decimal(pagerank_init)
+            'rank': decimal.Decimal(str(pagerank_init))
         }
     )
 # case: S3
@@ -122,4 +122,5 @@ iters = 20
 for iter in range(1, iters + 1):
     for page in page_relations:
         invoke_lambda(page, page_relations, iter)
+    print('%s 번째 진행 중...' %str(iter))
     time.sleep(10)
