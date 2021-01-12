@@ -43,7 +43,7 @@ def zipLambda(fname, zipname):
 
 
 def removeZip(zipname):
-    subprocess.call(['rm', '-rf'] + zipname)
+    subprocess.call(['rm', '-rf', zipname])
 
 
 def invoke_lambda(page, page_relations, iter):
@@ -122,7 +122,7 @@ removeZip(lambda_zip)
 #         invoke_lambda(page, page_relations[page], iter)
 #         break
 
-iters = 20
+iters = 25
 # case DynamodbDB
 for iter in range(1, iters + 1):
     for page in page_relations:
