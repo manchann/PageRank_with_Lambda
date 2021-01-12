@@ -42,6 +42,10 @@ def zipLambda(fname, zipname):
     subprocess.call(['zip', zipname] + glob.glob(fname + '.py'))
 
 
+def removeZip(zipname):
+    subprocess.call(['rm', '-rf'] + zipname)
+
+
 def invoke_lambda(page, page_relations, iter):
     '''
     Lambda 함수를 호출(invoke) 합니다.
@@ -102,6 +106,7 @@ for page in page_relations:
             'rank': decimal.Decimal(str(pagerank_init))
         }
     )
+removeZip(lambda_zip)
 # case: S3
 # file_read_path = '0.txt'
 # byte = 1024
@@ -122,5 +127,5 @@ iters = 20
 for iter in range(1, iters + 1):
     for page in page_relations:
         invoke_lambda(page, page_relations, iter)
-    print('%s 번째 진행 중...' %str(iter))
+    print('%s 번째 진행 중...' % str(iter))
     time.sleep(10)
