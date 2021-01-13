@@ -10,7 +10,6 @@ s3_client = boto3.client('s3')
 dynamodb = boto3.resource('dynamodb')
 db_name = 'jg-pagerank'
 table = dynamodb.Table(db_name)
-dampen_factor = 0.8
 
 
 # 주어진 bucket 위치 경로에 파일 이름이 key인 object와 data를 저장합니다.
@@ -35,6 +34,9 @@ def put_dynamodb_items(page, iter, rank):
             'rank': decimal.Decimal(str(rank))
         }
     )
+
+
+dampen_factor = 0.8
 
 
 def ranking(page, page_relations, past_pageranks):

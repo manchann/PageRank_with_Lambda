@@ -62,7 +62,7 @@ def invoke_lambda(page, page_relations, iter):
         })
     )
 
-
+#page들의 관계 데이터셋을 만들어 반환하는 함수 입니다.
 def get_page_relation(pages):
     page_relations = {}
     pages = pages['Body'].read().decode()
@@ -74,7 +74,6 @@ def get_page_relation(pages):
             page_relations[key] = []
         if value not in page_relations[key]:
             page_relations[key].append(value)
-
     return page_relations
 
 
@@ -87,17 +86,22 @@ def dynamodb_remove_all_items():
                 'page': each['page']
             })
 
-
+#DynamoDB에 있는 모든 값을 지웁니다.
 dynamodb_remove_all_items()
+
 zipLambda(lambda_name, lambda_zip)
-l_pagerank = lambdautils.LambdaManager(lambda_client, s3_client, region, config["lambda"]["zip"],
-                                       lambda_name, config["lambda"]["handler"])
+l_pagerank = lambdautils.LambdaManager(lambda_client, s3_client, region, config["lambda"]["zip"],lambda_name, config["lambda"]["handler"])
 l_pagerank.update_code_or_create_on_noexist()
+
+#page의 관계들이 담겨있는 파일을 가지고 dictionary 관계 데이터셋을 만듭니다.
 page_relations = get_page_relation(pages)
 
 print(page_relations)
+
+#모든 page의 초기 Rank값은 1/전체 페이지 수 의 값을 가집니다.
 pagerank_init = 1 / len(page_relations)
-page_nodes = []
+
+#DynamoDB에 모든 페이지의 초기값들을 업로드 합니다.
 for page in page_relations:
     table.put_item(
         Item={
@@ -106,6 +110,8 @@ for page in page_relations:
             'rank': decimal.Decimal(str(pagerank_init))
         }
     )
+
+#앞서 zip으로 만든 파일이 Lambda에 업로드 되었으므로 로컬에서의 zip파일을 삭제합니다.
 removeZip(lambda_zip)
 # case: S3
 # file_read_path = '0.txt'
@@ -122,6 +128,7 @@ removeZip(lambda_zip)
 #         invoke_lambda(page, page_relations[page], iter)
 #         break
 
+#반복 횟수를 설정합니다.
 iters = 25
 # case DynamodbDB
 for iter in range(1, iters + 1):
