@@ -69,12 +69,16 @@ def get_page_relation(pages):
     pages = pages['Body'].read().decode()
     lines = pages.split("\n")
     for line in lines:
-        key = line.split("\t")[0]
-        value = line.split("\t")[1]
-        if key not in page_relations:
-            page_relations[key] = []
-        if value not in page_relations[key]:
-            page_relations[key].append(value)
+        try:
+            key = line.split("\t")[0]
+            value = line.split("\t")[1]
+            value = value.replace("\r", "")
+            if key not in page_relations:
+                page_relations[key] = []
+            if value not in page_relations[key]:
+                page_relations[key].append(value)
+        except:
+            pass
     return page_relations
 
 
