@@ -82,6 +82,7 @@ def dynamodb_remove_all_items():
 
 # DynamoDB에 있는 모든 값을 지웁니다.
 dynamodb_remove_all_items()
+time.sleep(10)
 
 zipLambda(lambda_name, lambda_zip)
 l_pagerank = lambdautils.LambdaManager(lambda_client, s3_client, region, config["lambda"]["zip"], lambda_name,
