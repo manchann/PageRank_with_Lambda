@@ -4,7 +4,7 @@ import boto3
 from threading import Thread
 
 dynamodb = boto3.resource('dynamodb')
-db_name = 'jg-file-write'
+db_name = 'jg-file-write-lock'
 table = dynamodb.Table(db_name)
 
 
@@ -14,6 +14,7 @@ def dynamodb_remove_all_items():
         for each in scan['Items']:
             batch.delete_item(Key={
                 'case': each['case'],
+                'isLock': each['isLock']
             })
 
 
@@ -46,7 +47,7 @@ threads_1 = []
 #
 # for obj in test_set:
 #     requester(obj['bs'], obj['start'], obj['end'], obj['case'])
-dynamodb_remove_all_items()
+# dynamodb_remove_all_items()
 for obj in test_set10:
     t = Thread(target=requester, args=(obj['bs'], obj['start'], obj['end'], obj['case']))
     t.start()
