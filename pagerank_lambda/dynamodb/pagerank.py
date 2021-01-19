@@ -71,7 +71,7 @@ def lambda_handler(event, context):
 
     page_relation = get_page_relation(page, past_pageranks)
     page_rank = ranking(page_relation, past_pageranks) + remain_page
-
+    print(page)
     put_dynamodb_items(page, iter, page_rank)
     return page_rank
 

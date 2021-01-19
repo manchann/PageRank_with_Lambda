@@ -48,7 +48,7 @@ def removeZip(zipname):
     subprocess.call(['rm', '-rf', zipname])
 
 
-def invoke_lambda(page, page_relations, iter, remain_page):
+def invoke_lambda(page, iter, remain_page):
     '''
     Lambda 함수를 호출(invoke) 합니다.
     '''
@@ -58,7 +58,6 @@ def invoke_lambda(page, page_relations, iter, remain_page):
         InvocationType='RequestResponse',
         Payload=json.dumps({
             "page": page,
-            "page_relation": page_relations,
             "iter": iter,
             "remain_page": remain_page
         })
@@ -92,17 +91,16 @@ l_pagerank.update_code_or_create_on_noexist()
 # page의 관계들이 담겨있는 파일을 가지고 dictionary 관계 데이터셋을 만듭니다.
 page_relations = get_page_relation(relation_table)
 
-print(page_relations)
-
 # 모든 page의 초기 Rank값은 1/전체 페이지 수 의 값을 가집니다.
 pagerank_init = 1 / len(page_relations)
 
 # DynamoDB에 모든 페이지의 초기값들을 업로드 합니다.
 for page in page_relations:
+    # print(page)
     table.put_item(
         Item={
             'iter': 0,
-            'page': str(page),
+            'page': str(page['page']),
             'rank': decimal.Decimal(str(pagerank_init)),
         }
     )
@@ -131,6 +129,6 @@ remain_page = (1 - dampen_factor) / len(page_relations)
 # case DynamodbDB
 for iter in range(1, iters + 1):
     for page in page_relations:
-        invoke_lambda(page, page, iter, remain_page)
+        invoke_lambda(page, iter, remain_page)
     print('%s 번째 진행 중...' % str(iter))
     time.sleep(10)
