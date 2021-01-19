@@ -40,6 +40,7 @@ def get_page_relation(pages):
                 page_relations[key] = []
             if value not in page_relations[key]:
                 page_relations[key].append(value)
+            print(key, value)
         except:
             pass
 
@@ -57,7 +58,6 @@ def dynamodb_remove_all_items():
 
 # DynamoDB에 있는 모든 값을 지웁니다.
 dynamodb_remove_all_items()
-
 # page의 관계들이 담겨있는 파일을 가지고 dictionary 관계 데이터셋을 만듭니다.
 page_relations = get_page_relation(pages)
 

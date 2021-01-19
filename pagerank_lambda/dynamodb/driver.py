@@ -17,6 +17,8 @@ s3_client = boto3.client('s3')
 dynamodb = boto3.resource('dynamodb', region_name='us-west-2')
 db_name = 'jg-pagerank'
 table = dynamodb.Table(db_name)
+relation_name = 'jg-page-relation'
+relation_table = dynamodb.Table(relation_name)
 
 config = json.loads(open('driverconfig.json', 'r').read())
 
@@ -64,22 +66,9 @@ def invoke_lambda(page, page_relations, iter, remain_page):
 
 
 # page들의 관계 데이터셋을 만들어 반환하는 함수 입니다.
-def get_page_relation(pages):
-    page_relations = {}
-    pages = pages['Body'].read().decode()
-    lines = pages.split("\n")
-    for line in lines:
-        try:
-            key = line.split("\t")[0]
-            value = line.split("\t")[1]
-            value = value.replace("\r", "")
-            if key not in page_relations:
-                page_relations[key] = []
-            if value not in page_relations[key]:
-                page_relations[key].append(value)
-        except:
-            pass
-    return page_relations
+def get_page_relation(t):
+    response = t.scan()
+    return response['Items']
 
 
 def dynamodb_remove_all_items():
@@ -101,7 +90,7 @@ l_pagerank = lambdautils.LambdaManager(lambda_client, s3_client, region, config[
 l_pagerank.update_code_or_create_on_noexist()
 
 # page의 관계들이 담겨있는 파일을 가지고 dictionary 관계 데이터셋을 만듭니다.
-page_relations = get_page_relation(pages)
+page_relations = get_page_relation(relation_table)
 
 print(page_relations)
 
@@ -113,9 +102,8 @@ for page in page_relations:
     table.put_item(
         Item={
             'iter': 0,
-            'page': page,
+            'page': str(page),
             'rank': decimal.Decimal(str(pagerank_init)),
-            'relation': page_relations[page]
         }
     )
 
