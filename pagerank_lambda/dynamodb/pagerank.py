@@ -31,7 +31,7 @@ def get_dynamodb_items(t, iter):
         return response['Items']
 
 
-def put_dynamodb_items(page, iter, rank, relation):
+def put_dynamodb_items(page, iter, rank):
     table.put_item(
         Item={
             'iter': iter,
@@ -72,7 +72,7 @@ def lambda_handler(event, context):
     page_relation = get_page_relation(page, past_pageranks)
     page_rank = ranking(page_relation, past_pageranks) + remain_page
 
-    put_dynamodb_items(page, iter, page_rank, page_relation)
+    put_dynamodb_items(page, iter, page_rank)
     return page_rank
 
     # case: S3
