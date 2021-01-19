@@ -26,7 +26,7 @@ bucket = config["bucket"]
 region = config["region"]
 
 pages_list = []
-for i in range(1, 10):
+for i in range(1, 11):
     page_path = config["pages"] + str(i)
     p = s3_client.get_object(Bucket=bucket, Key=page_path)
     pages_list.append(p)
@@ -78,7 +78,7 @@ dynamodb_remove_all_items()
 thread_list = []
 
 for pages in pages_list:
-    t = Thread(target=get_page_relation, args=(pages))
+    t = Thread(target=get_page_relation, args=(pages,))
     t.start()
     thread_list.append(t)
 for thr in thread_list:
