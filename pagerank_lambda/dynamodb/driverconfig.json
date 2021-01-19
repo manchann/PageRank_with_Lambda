@@ -1,7 +1,7 @@
 {
   "bucket": "jg-pagerank-bucket",
   "prefix": "/",
-  "pages": "bigdata-input-1.txt",
+  "pages": "input1/",
   "jobBucket": "jg-pagerank-bucket",
   "region": "us-west-2",
   "lambdaMemory": 512,

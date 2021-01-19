@@ -4,6 +4,7 @@ import glob
 import subprocess
 import lambdautils
 import decimal
+from threading import Thread
 import time
 from botocore.client import Config
 from boto3.dynamodb.types import DYNAMODB_CONTEXT
@@ -23,8 +24,16 @@ s3_client = boto3.client('s3')
 
 bucket = config["bucket"]
 region = config["region"]
-pages = s3_client.get_object(Bucket=bucket, Key=config["pages"])
 
+pages_list = []
+for i in range(1, 10):
+    page_path = config["pages"] + str(i)
+    p = s3_client.get_object(Bucket=bucket, Key=page_path)
+    pages_list.append(p)
+
+
+# pages = s3_client.get_object(Bucket=bucket, Key=config["pages"])
+# print(pages)
 
 # page들의 관계 데이터셋을 만들어 반환하는 함수 입니다.
 def get_page_relation(pages):
@@ -43,8 +52,14 @@ def get_page_relation(pages):
             print(key, value)
         except:
             pass
-
-    return page_relations
+    for page in page_relations:
+        table.put_item(
+            Item={
+                'page': str(page),
+                'relation': page_relations[page]
+            }
+        )
+    return True
 
 
 def dynamodb_remove_all_items():
@@ -59,13 +74,22 @@ def dynamodb_remove_all_items():
 # DynamoDB에 있는 모든 값을 지웁니다.
 dynamodb_remove_all_items()
 # page의 관계들이 담겨있는 파일을 가지고 dictionary 관계 데이터셋을 만듭니다.
-page_relations = get_page_relation(pages)
+# page_relations = get_page_relation(pages)
+thread_list = []
+
+for pages in pages_list:
+    t = Thread(target=get_page_relation, args=(pages))
+    t.start()
+    thread_list.append(t)
+for thr in thread_list:
+    thr.join()
 
 # DynamoDB에 page relation 업로드
-for page in page_relations:
-    table.put_item(
-        Item={
-            'page': str(page),
-            'relation': page_relations[page]
-        }
-    )
+
+# for page in page_relations:
+#     table.put_item(
+#         Item={
+#             'page': str(page),
+#             'relation': page_relations[page]
+#         }
+#     )
