@@ -131,5 +131,5 @@ remain_page = (1 - dampen_factor) / len(page_relations)
 for iter in range(1, iters + 1):
     for page in page_relations:
         invoke_lambda(page['page'], iter, remain_page)
-        print('%s 번째 %s 페이지 진행 중...' % (str(iter), str(page)))
+        print('%s 번째 %s 페이지 진행 중...' % (str(iter), str(page['page'])))
     time.sleep(10)
