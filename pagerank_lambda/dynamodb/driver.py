@@ -131,6 +131,6 @@ remain_page = (1 - dampen_factor) / len(page_relations)
 # case DynamodbDB
 for iter in range(1, iters + 1):
     for page in page_relations:
-        invoke_lambda(page, iter, remain_page)
+        invoke_lambda(page['page'], iter, remain_page)
     print('%s 번째 진행 중...' % str(iter))
     time.sleep(10)
