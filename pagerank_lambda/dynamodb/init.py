@@ -53,6 +53,7 @@ def get_page_relation(pages):
         except:
             pass
     for page in page_relations:
+        print('page: ', page)
         table.put_item(
             Item={
                 'page': str(page),
