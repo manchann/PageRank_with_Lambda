@@ -68,9 +68,16 @@ def lambda_handler(event, context):
     iter = event['iter']
     remain_page = event['remain_page']
     past_pageranks = get_dynamodb_items(table, iter)
-
+    page_rank = 0
     page_relation = get_page_relation(page, past_pageranks)
-    page_rank = ranking(page_relation, past_pageranks) + remain_page
+    try:
+        page_rank = ranking(page_relation, past_pageranks) + remain_page
+    except:
+        response = table.scan()
+        for res in response['Items']:
+            if res['iter'] == 0:
+                if page == res['page']:
+                    page_rank = res['rank']
     print(page)
     put_dynamodb_items(page, iter, page_rank)
     return page_rank
