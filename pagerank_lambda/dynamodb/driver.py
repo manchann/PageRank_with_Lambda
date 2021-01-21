@@ -17,7 +17,7 @@ s3_client = boto3.client('s3')
 dynamodb = boto3.resource('dynamodb', region_name='us-west-2')
 db_name = 'jg-pagerank'
 table = dynamodb.Table(db_name)
-relation_name = 'jg-page-relation'
+relation_name = 'jg-page-relation-exam2.txt'
 relation_table = dynamodb.Table(relation_name)
 
 config = json.loads(open('driverconfig.json', 'r').read())

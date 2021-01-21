@@ -9,7 +9,7 @@ s3 = boto3.resource('s3')
 s3_client = boto3.client('s3')
 dynamodb = boto3.resource('dynamodb')
 db_name = 'jg-pagerank'
-relation_name = 'jg-page-relation'
+relation_name = 'jg-page-relation-exam2.txt'
 table = dynamodb.Table(db_name)
 relation_table = dynamodb.Table(relation_name)
 

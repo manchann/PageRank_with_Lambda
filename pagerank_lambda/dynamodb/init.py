@@ -14,8 +14,6 @@ DYNAMODB_CONTEXT.traps[decimal.Inexact] = 0
 # Inhibit Rounded Exceptions
 DYNAMODB_CONTEXT.traps[decimal.Rounded] = 0
 dynamodb = boto3.resource('dynamodb', region_name='us-west-2')
-db_name = 'jg-page-relation'
-table = dynamodb.Table(db_name)
 
 config = json.loads(open('driverconfig.json', 'r').read())
 
@@ -25,12 +23,16 @@ s3_client = boto3.client('s3')
 bucket = config["bucket"]
 region = config["region"]
 
-pages_list = []
-for i in range(1, 11):
-    page_path = config["pages"] + str(i)
-    p = s3_client.get_object(Bucket=bucket, Key=page_path)
-    pages_list.append(p)
+db_name = 'jg-page-relation' + '-' + config['pages']
+table = dynamodb.Table(db_name)
 
+pages_list = []
+# for i in range(1, 11):
+#     page_path = config["pages"] + str(i)
+#     p = s3_client.get_object(Bucket=bucket, Key=page_path)
+#     pages_list.append(p)
+p = s3_client.get_object(Bucket=bucket, Key=config['pages'])
+pages_list.append(p)
 
 # pages = s3_client.get_object(Bucket=bucket, Key=config["pages"])
 # print(pages)
