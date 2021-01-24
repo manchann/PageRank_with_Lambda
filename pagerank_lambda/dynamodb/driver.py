@@ -65,11 +65,30 @@ def invoke_lambda(pages_range, divided_page_num, iter, remain_page):
     )
 
 
+def scanRecursive(tableName, **kwargs):
+    """
+    NOTE: Anytime you are filtering by a specific equivalency attribute such as id, name
+    or date equal to ... etc., you should consider using a query not scan
+
+    kwargs are any parameters you want to pass to the scan operation
+    """
+    dbTable = dynamodb.Table(tableName)
+    response = dbTable.scan(**kwargs)
+    if kwargs.get('Select') == "COUNT":
+        return response.get('Count')
+    data = response.get('Items')
+    while 'LastEvaluatedKey' in response:
+        response = kwargs.get('table').scan(ExclusiveStartKey=response['LastEvaluatedKey'], **kwargs)
+        data.extend(response['Items'])
+    return data
+
+
 # page들의 관계 데이터셋을 만들어 반환하는 함수 입니다.
 def get_page_relation(t):
-    response = t.scan()
-    print(response["Count"])
-    return response['Items']
+    # response = t.scan()
+    # scanRecursive(t)
+    # print(response["Count"])
+    return scanRecursive(t)
 
 
 def dynamodb_remove_all_items():
