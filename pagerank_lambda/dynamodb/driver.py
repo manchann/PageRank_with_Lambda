@@ -59,7 +59,7 @@ def invoke_lambda(page, iter, remain_page):
         Payload=json.dumps({
             "page": page,
             "iter": iter,
-            "remain_page": remain_page
+            "remain_page": remain_page,
         })
     )
 
@@ -103,6 +103,7 @@ for page in page_relations:
             'iter': 0,
             'page': str(page['page']),
             'rank': decimal.Decimal(str(pagerank_init)),
+            'relation_length': len(page['relation'])
         }
     )
 
@@ -127,9 +128,10 @@ removeZip(lambda_zip)
 iters = 25
 dampen_factor = 0.8
 remain_page = (1 - dampen_factor) / len(page_relations)
+divided_page_num = 1000
 # case DynamodbDB
 for iter in range(1, iters + 1):
     for page in page_relations:
         invoke_lambda(page['page'], iter, remain_page)
         print('%s 번째 %s 페이지 진행 중...' % (str(iter), str(page['page'])))
-    time.sleep(10)
+    time.sleep(60)
