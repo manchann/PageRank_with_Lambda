@@ -102,7 +102,7 @@ pagerank_init = 1 / len(page_relations)
 # DynamoDB에 모든 페이지의 초기값들을 업로드 합니다.
 def init_iter(page):
     # print('%s 번 page 진행 중...' % str(page['page']))
-    print(page)
+    print(page['page'])
     table.put_item(
         Item={
             'iter': 0,
