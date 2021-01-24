@@ -7,6 +7,7 @@ import decimal
 import time
 from botocore.client import Config
 from boto3.dynamodb.types import DYNAMODB_CONTEXT
+from threading import Thread
 
 # Inhibit Inexact Exceptions
 DYNAMODB_CONTEXT.traps[decimal.Inexact] = 0
@@ -17,7 +18,7 @@ s3_client = boto3.client('s3')
 dynamodb = boto3.resource('dynamodb', region_name='us-west-2')
 db_name = 'jg-pagerank'
 table = dynamodb.Table(db_name)
-relation_name = 'jg-page-relation-exam2.txt'
+relation_name = 'jg-page-relation'
 relation_table = dynamodb.Table(relation_name)
 
 config = json.loads(open('driverconfig.json', 'r').read())
@@ -30,7 +31,6 @@ lambda_read_timeout = config["lambda_read_timeout"]
 boto_max_connections = config["boto_max_connections"]
 lambda_name = config["lambda"]["name"]
 lambda_zip = config["lambda"]["zip"]
-pages = s3_client.get_object(Bucket=bucket, Key=config["pages"])
 
 lambda_config = Config(read_timeout=lambda_read_timeout, max_pool_connections=boto_max_connections)
 lambda_client = boto3.client('lambda', config=lambda_config)
@@ -48,7 +48,7 @@ def removeZip(zipname):
     subprocess.call(['rm', '-rf', zipname])
 
 
-def invoke_lambda(page, iter, remain_page):
+def invoke_lambda(pages_range, divided_page_num, iter, remain_page):
     '''
     Lambda 함수를 호출(invoke) 합니다.
     '''
@@ -57,8 +57,9 @@ def invoke_lambda(page, iter, remain_page):
         FunctionName=lambda_name,
         InvocationType='RequestResponse',
         Payload=json.dumps({
-            "page": page,
+            "pages_range": pages_range,
             "iter": iter,
+            "divided_page_num": divided_page_num,
             "remain_page": remain_page,
         })
     )
@@ -95,9 +96,10 @@ page_relations = get_page_relation(relation_table)
 # 모든 page의 초기 Rank값은 1/전체 페이지 수 의 값을 가집니다.
 pagerank_init = 1 / len(page_relations)
 
+
 # DynamoDB에 모든 페이지의 초기값들을 업로드 합니다.
-for page in page_relations:
-    print('%s 번째 page 진행 중...' % str(page['page']))
+def init_iter(page):
+    print('%s 번 page 진행 중...' % str(page['page']))
     table.put_item(
         Item={
             'iter': 0,
@@ -107,31 +109,36 @@ for page in page_relations:
         }
     )
 
+
+init_return = []
+for page in page_relations:
+    init_t = Thread(target=init_iter,
+                    args=(page,))
+    print('%s 번 page 진행 중...' % str(page['page']))
+for init_t in init_return:
+    init_t.join()
+
 # 앞서 zip으로 만든 파일이 Lambda에 업로드 되었으므로 로컬에서의 zip파일을 삭제합니다.
 removeZip(lambda_zip)
-# case: S3
-# file_read_path = '0.txt'
-# byte = 1024
-# with open(file_read_path, 'w+b', 0) as f:
-#     for page in page_relations:
-#         f.seek(int(page) * byte)
-#         f.write(str(pagerank_init).encode())
-# write_to_s3(bucket, file_read_path, open('./0.txt', 'rb'))
-# progress = '/progress'
-#
-# for iter in range(1, iters + 1):
-#     for page in page_relations:
-#         invoke_lambda(page, page_relations[page], iter)
-#         break
-
 # 반복 횟수를 설정합니다.
 iters = 25
 dampen_factor = 0.8
 remain_page = (1 - dampen_factor) / len(page_relations)
-divided_page_num = 1000
+divided_page_num = 10000
+pages_range = int(len(page_relations) / divided_page_num)
+last_range = len(page_relations) % divided_page_num
 # case DynamodbDB
+
 for iter in range(1, iters + 1):
-    for page in page_relations:
-        invoke_lambda(page['page'], iter, remain_page)
-        print('%s 번째 %s 페이지 진행 중...' % (str(iter), str(page['page'])))
-    time.sleep(60)
+    t_return = []
+    divide = divided_page_num
+    for pages in range(pages_range + 1):
+        print('%s 번째 %s 페이지범위 진행 중...' % (str(iter), str(pages)))
+        if pages == pages_range and last_range > 0:
+            divide = last_range
+        t = Thread(target=invoke_lambda, args=(divided_page_num * pages, divide, iter, remain_page))
+        t.start()
+        t_return.append(t)
+    for t in t_return:
+        t.join()
+    time.sleep(10)

@@ -4,13 +4,14 @@ import resource
 import time
 import decimal
 from botocore.client import Config
+from threading import Thread
 
 # S3 session 생성
 s3 = boto3.resource('s3')
 s3_client = boto3.client('s3')
 dynamodb = boto3.resource('dynamodb')
 db_name = 'jg-pagerank'
-relation_name = 'jg-page-relation-exam2.txt'
+relation_name = 'jg-page-relation'
 rank_table = dynamodb.Table(db_name)
 relation_table = dynamodb.Table(relation_name)
 
@@ -81,12 +82,23 @@ def ranking(page_relation, past_pageranks):
     return leave_page
 
 
-def lambda_handler(event, context):
-    page = event['page']
-    iter = event['iter']
-    remain_page = event['remain_page']
+def each_page(page, iter, remain_page):
     page_relation = get_page_relation(relation_table, page)
     past_pagerank = get_past_pagerank(rank_table, iter, page_relation)
     page_rank = ranking(page_relation, past_pagerank) + remain_page
     put_dynamodb_items(page, iter, page_rank, len(page_relation['relation']))
-    return page_rank
+
+
+def lambda_handler(event, context):
+    pages_range = event['pages_range']
+    iter = event['iter']
+    remain_page = event['remain_page']
+    divided_page_num = event['divided_page_num']
+    t_return = []
+    for page in range(pages_range, pages_range + divided_page_num):
+        t = Thread(target=each_page, args=(str(page), iter, remain_page))
+        t.start()
+        t_return.append(t)
+    for t in t_return:
+        t.join()
+    return iter + '번째 ' + pages_range + '범위 완료'
