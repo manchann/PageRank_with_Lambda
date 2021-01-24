@@ -50,8 +50,10 @@ def get_page_relation(t, page):
 
 def get_past_pagerank(t, iter, page_relation):
     past_pagerank = []
+    print(page_relation['relation'])
     for page in page_relation['relation']:
         past_page_info = t.get_item(Key={'iter': iter - 1, 'page': str(page)})
+        print('past_page_info', past_page_info)
         past_pagerank.append(past_page_info['Item'])
     return past_pagerank
 
@@ -101,4 +103,4 @@ def lambda_handler(event, context):
         t_return.append(t)
     for t in t_return:
         t.join()
-    return str(iter) + '번째 ' + pages_range + '범위 완료'
+    return str(iter) + '번째 ' + str(pages_range) + '범위 완료'
