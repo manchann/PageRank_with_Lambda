@@ -88,7 +88,7 @@ def get_page_relation(t):
     # response = t.scan()
     # scanRecursive(t)
     # print(response["Count"])
-    return scanRecursive(t)
+    return scanRecursive(relation_name, None)
 
 
 def dynamodb_remove_all_items():
