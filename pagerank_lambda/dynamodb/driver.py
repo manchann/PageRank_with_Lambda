@@ -131,6 +131,10 @@ remain_page = (1 - dampen_factor) / len(page_relations)
 divided_page_num = 1000
 pages_range = int(len(page_relations) / divided_page_num)
 last_range = len(page_relations) % divided_page_num
+
+print('pages 총 개수:', len(page_relations))
+print('pages 분할 개수:', divided_page_num)
+
 # case DynamodbDB
 
 for iter in range(1, iters + 1):
@@ -145,4 +149,4 @@ for iter in range(1, iters + 1):
         t_return.append(t)
     for t in t_return:
         t.join()
-    time.sleep(10)
+    time.sleep(60)
