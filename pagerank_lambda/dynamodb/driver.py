@@ -68,6 +68,7 @@ def invoke_lambda(pages_range, divided_page_num, iter, remain_page):
 # page들의 관계 데이터셋을 만들어 반환하는 함수 입니다.
 def get_page_relation(t):
     response = t.scan()
+    print(response["Count"])
     return response['Items']
 
 
@@ -94,7 +95,6 @@ l_pagerank.update_code_or_create_on_noexist()
 
 # page의 관계들이 담겨있는 파일을 가지고 dictionary 관계 데이터셋을 만듭니다.
 page_relations = get_page_relation(relation_table)
-
 # 모든 page의 초기 Rank값은 1/전체 페이지 수 의 값을 가집니다.
 pagerank_init = 1 / len(page_relations)
 
