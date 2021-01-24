@@ -82,6 +82,8 @@ def dynamodb_remove_all_items():
 
 
 # DynamoDB에 있는 모든 값을 지웁니다.
+# subprocess.call(['export', "serverless_mapreduce_role=arn:aws:iam::741926482963:role/biglambda_role"])
+
 dynamodb_remove_all_items()
 time.sleep(10)
 
@@ -99,7 +101,8 @@ pagerank_init = 1 / len(page_relations)
 
 # DynamoDB에 모든 페이지의 초기값들을 업로드 합니다.
 def init_iter(page):
-    print('%s 번 page 진행 중...' % str(page['page']))
+    # print('%s 번 page 진행 중...' % str(page['page']))
+    print(page)
     table.put_item(
         Item={
             'iter': 0,
@@ -114,10 +117,11 @@ init_return = []
 for page in page_relations:
     init_t = Thread(target=init_iter,
                     args=(page,))
-    print('%s 번 page 진행 중...' % str(page['page']))
+    init_t.start()
+    init_return.append(init_t)
 for init_t in init_return:
     init_t.join()
-
+print('init 끝')
 # 앞서 zip으로 만든 파일이 Lambda에 업로드 되었으므로 로컬에서의 zip파일을 삭제합니다.
 removeZip(lambda_zip)
 # 반복 횟수를 설정합니다.
