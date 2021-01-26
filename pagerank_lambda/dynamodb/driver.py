@@ -9,6 +9,7 @@ import time
 from botocore.client import Config
 from boto3.dynamodb.types import DYNAMODB_CONTEXT
 from threading import Thread
+os.system('export serverless_mapreduce_role=arn:aws:iam::741926482963:role/biglambda_role')
 
 # Inhibit Inexact Exceptions
 DYNAMODB_CONTEXT.traps[decimal.Inexact] = 0
@@ -85,7 +86,6 @@ def dynamodb_remove_all_items():
 
 
 # DynamoDB에 있는 모든 값을 지웁니다.
-os.system('export serverless_mapreduce_role=arn:aws:iam::741926482963:role/biglambda_role')
 
 dynamodb_remove_all_items()
 time.sleep(10)
