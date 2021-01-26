@@ -117,13 +117,14 @@ def init_iter(page, relation):
 print(page_relations)
 
 init_return = []
-for page, relation in page_relations.items():
-    init_t = Thread(target=init_iter,
-                    args=(page, relation,))
-    init_t.start()
-    init_return.append(init_t)
-for init_t in init_return:
-    init_t.join()
+for page_relation in page_relations:
+    for page, relation in page_relations.items():
+        init_t = Thread(target=init_iter,
+                        args=(page, relation,))
+        init_t.start()
+        init_return.append(init_t)
+    for init_t in init_return:
+        init_t.join()
 print('init 끝')
 # 앞서 zip으로 만든 파일이 Lambda에 업로드 되었으므로 로컬에서의 zip파일을 삭제합니다.
 removeZip(lambda_zip)
