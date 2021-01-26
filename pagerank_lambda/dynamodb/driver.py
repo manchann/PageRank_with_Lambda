@@ -132,7 +132,7 @@ removeZip(lambda_zip)
 iters = 3
 dampen_factor = 0.8
 remain_page = (1 - dampen_factor) / total_page_length
-divided_page_num = 10000
+divided_page_num = 5000
 pages_range = int(total_page_length / divided_page_num)
 last_range = total_page_length % divided_page_num
 
