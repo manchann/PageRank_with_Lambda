@@ -114,11 +114,10 @@ def init_iter(page, relation):
             'relation': relation
         }
     )
-print(page_relations)
 
 init_return = []
 for page_relation in page_relations:
-    for page, relation in page_relations.items():
+    for page, relation in page_relation.items():
         init_t = Thread(target=init_iter,
                         args=(page, relation,))
         init_t.start()
