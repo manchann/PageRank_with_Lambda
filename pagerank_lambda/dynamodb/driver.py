@@ -115,6 +115,7 @@ def init_iter(page, relation):
     )
 
 
+init_start = time.time()
 init_return = []
 for page_relation in page_relations:
     for page, relation in page_relation.items():
@@ -124,7 +125,7 @@ for page_relation in page_relations:
         init_return.append(init_t)
     for init_t in init_return:
         init_t.join()
-print('init 끝')
+print('init 끝, 걸린 시간: ', time.time() - init_start)
 # 앞서 zip으로 만든 파일이 Lambda에 업로드 되었으므로 로컬에서의 zip파일을 삭제합니다.
 removeZip(lambda_zip)
 # 반복 횟수를 설정합니다.
@@ -139,7 +140,6 @@ print('pages 총 개수:', total_page_relations)
 print('pages 분할 개수:', divided_page_num)
 
 # case DynamodbDB
-
 for iter in range(1, iters + 1):
     t_return = []
     divide = divided_page_num
@@ -152,4 +152,4 @@ for iter in range(1, iters + 1):
         t_return.append(t)
     for t in t_return:
         t.join()
-    time.sleep(10)
+    time.sleep(60)
