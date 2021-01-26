@@ -99,7 +99,7 @@ for i in range(10):
     page_relations.append(get_page_relation(str(i)))
     total_page_relations += len(page_relations[i])
 # 모든 page의 초기 Rank값은 1/전체 페이지 수 의 값을 가집니다.
-pagerank_init = 1 / len(page_relations)
+pagerank_init = 1 / len(total_page_relations)
 
 
 # DynamoDB에 모든 페이지의 초기값들을 업로드 합니다.
@@ -131,11 +131,11 @@ removeZip(lambda_zip)
 iters = 25
 dampen_factor = 0.8
 remain_page = (1 - dampen_factor) / len(page_relations)
-divided_page_num = 5
+divided_page_num = 1000
 pages_range = int(len(page_relations) / divided_page_num)
 last_range = len(page_relations) % divided_page_num
 
-print('pages 총 개수:', len(page_relations))
+print('pages 총 개수:', total_page_relations)
 print('pages 분할 개수:', divided_page_num)
 
 # case DynamodbDB
