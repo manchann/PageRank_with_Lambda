@@ -40,13 +40,14 @@ for i in range(1, 11):
     p = s3_client.get_object(Bucket=bucket, Key=page_path)
     pages_list.append(p)
 
+
 # case: light data
 # p = s3_client.get_object(Bucket=bucket, Key=config['pages'])
 # pages_list.append(p)
 
 
 # page들의 관계 데이터셋을 만들어 반환하는 함수 입니다.
-def get_page_relation(pages):
+def get_page_relation(pages, file):
     page_relations = {}
     pages = pages['Body'].read().decode()
     lines = pages.split("\n")
@@ -62,9 +63,7 @@ def get_page_relation(pages):
             print(key, value)
         except:
             pass
-    print(relation_prefix + config['pages'])
-    print(json.dumps(page_relations))
-    write_to_s3(bucket, config['relationPrefix'] + config['pages'], json.dumps(page_relations).encode(), {})
+    write_to_s3(bucket, config['relationPrefix'] + config['pages'] + file, json.dumps(page_relations).encode(), {})
 
     return True
 
@@ -72,6 +71,10 @@ def get_page_relation(pages):
 # page의 관계들이 담겨있는 파일을 가지고 dictionary 관계 데이터셋을 만듭니다.
 thread_list = []
 
+for idx in range(len(pages_list)):
+    t = Thread(target=get_page_relation, args=(pages_list[idx], str(idx)))
+    t.start()
+    thread_list.append(t)
 for pages in pages_list:
     t = Thread(target=get_page_relation, args=(pages,))
     t.start()

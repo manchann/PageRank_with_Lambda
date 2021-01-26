@@ -85,7 +85,7 @@ def dynamodb_remove_all_items():
 
 
 # DynamoDB에 있는 모든 값을 지웁니다.
-os.system('export', "serverless_mapreduce_role=arn:aws:iam::741926482963:role/biglambda_role")
+os.system('export serverless_mapreduce_role=arn:aws:iam::741926482963:role/biglambda_role')
 
 dynamodb_remove_all_items()
 time.sleep(10)
@@ -96,7 +96,9 @@ l_pagerank = lambdautils.LambdaManager(lambda_client, s3_client, region, config[
 l_pagerank.update_code_or_create_on_noexist()
 
 # page의 관계들이 담겨있는 파일을 가지고 dictionary 관계 데이터셋을 만듭니다.
-page_relations = get_page_relation('')
+page_relations = []
+for i in range(10):
+    page_relations.append(get_page_relation(str(i)))
 # 모든 page의 초기 Rank값은 1/전체 페이지 수 의 값을 가집니다.
 pagerank_init = 1 / len(page_relations)
 
