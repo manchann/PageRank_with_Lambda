@@ -9,12 +9,9 @@ import time
 from botocore.client import Config
 from boto3.dynamodb.types import DYNAMODB_CONTEXT
 from threading import Thread
+
 os.system('export serverless_mapreduce_role=arn:aws:iam::741926482963:role/biglambda_role')
 
-# Inhibit Inexact Exceptions
-DYNAMODB_CONTEXT.traps[decimal.Inexact] = 0
-# Inhibit Rounded Exceptions
-DYNAMODB_CONTEXT.traps[decimal.Rounded] = 0
 s3 = boto3.resource('s3')
 s3_client = boto3.client('s3')
 dynamodb = boto3.resource('dynamodb', region_name='us-west-2')
@@ -114,6 +111,7 @@ def init_iter(page, relation):
             'relation': relation
         }
     )
+
 
 init_return = []
 for page_relation in page_relations:
