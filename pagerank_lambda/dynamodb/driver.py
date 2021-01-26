@@ -94,12 +94,12 @@ l_pagerank.update_code_or_create_on_noexist()
 
 # page의 관계들이 담겨있는 파일을 가지고 dictionary 관계 데이터셋을 만듭니다.
 page_relations = []
-total_page_relations = 0
+total_page_length = 0
 for i in range(10):
     page_relations.append(get_page_relation(str(i)))
-    total_page_relations += len(page_relations[i])
+    total_page_length += len(page_relations[i])
 # 모든 page의 초기 Rank값은 1/전체 페이지 수 의 값을 가집니다.
-pagerank_init = 1 / len(total_page_relations)
+pagerank_init = 1 / total_page_length
 
 
 # DynamoDB에 모든 페이지의 초기값들을 업로드 합니다.
@@ -131,25 +131,25 @@ removeZip(lambda_zip)
 # 반복 횟수를 설정합니다.
 iters = 25
 dampen_factor = 0.8
-remain_page = (1 - dampen_factor) / len(page_relations)
+remain_page = (1 - dampen_factor) / total_page_length
 divided_page_num = 1000
-pages_range = int(len(page_relations) / divided_page_num)
-last_range = len(page_relations) % divided_page_num
+pages_range = int(total_page_length / divided_page_num)
+last_range = total_page_length % divided_page_num
 
-print('pages 총 개수:', total_page_relations)
+print('pages 총 개수:', total_page_length)
 print('pages 분할 개수:', divided_page_num)
 
 # case DynamodbDB
 for iter in range(1, iters + 1):
     t_return = []
-    divide = divided_page_num
-    for pages in range(pages_range + 1):
-        print('%s 번째 %s 페이지범위 진행 중...' % (str(iter), str(pages)))
-        if pages == pages_range and last_range > 0:
-            divide = last_range
-        t = Thread(target=invoke_lambda, args=(divided_page_num * pages, divide, iter, remain_page))
-        t.start()
-        t_return.append(t)
-    for t in t_return:
-        t.join()
-    time.sleep(60)
+divide = divided_page_num
+for pages in range(pages_range + 1):
+    print('%s 번째 %s 페이지범위 진행 중...' % (str(iter), str(pages)))
+if pages == pages_range and last_range > 0:
+    divide = last_range
+t = Thread(target=invoke_lambda, args=(divided_page_num * pages, divide, iter, remain_page))
+t.start()
+t_return.append(t)
+for t in t_return:
+    t.join()
+time.sleep(60)
