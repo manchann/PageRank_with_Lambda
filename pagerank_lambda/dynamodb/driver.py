@@ -142,14 +142,14 @@ print('pages 분할 개수:', divided_page_num)
 # case DynamodbDB
 for iter in range(1, iters + 1):
     t_return = []
-divide = divided_page_num
-for pages in range(pages_range + 1):
-    print('%s 번째 %s 페이지범위 진행 중...' % (str(iter), str(pages)))
-if pages == pages_range and last_range > 0:
-    divide = last_range
-t = Thread(target=invoke_lambda, args=(divided_page_num * pages, divide, iter, remain_page))
-t.start()
-t_return.append(t)
-for t in t_return:
-    t.join()
-time.sleep(60)
+    divide = divided_page_num
+    for pages in range(pages_range + 1):
+        print('%s 번째 %s 페이지범위 진행 중...' % (str(iter), str(pages)))
+        if pages == pages_range and last_range > 0:
+            divide = last_range
+        t = Thread(target=invoke_lambda, args=(divided_page_num * pages, divide, iter, remain_page))
+        t.start()
+        t_return.append(t)
+    for t in t_return:
+        t.join()
+    time.sleep(60)
