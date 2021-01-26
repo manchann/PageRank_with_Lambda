@@ -114,7 +114,7 @@ def init_iter(page, relation):
             'relation': relation
         }
     )
-
+print(page_relations)
 
 init_return = []
 for page, relation in page_relations.items():
