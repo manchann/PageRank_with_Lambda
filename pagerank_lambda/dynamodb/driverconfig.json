@@ -1,8 +1,9 @@
 {
   "bucket": "jg-pagerank-bucket",
   "prefix": "/",
-  "pages": "exam2.txt",
+  "pages": "input1/",
   "jobBucket": "jg-pagerank-bucket",
+  "relationPrefix": "relation/",
   "region": "us-west-2",
   "lambdaMemory": 512,
   "concurrentLambdas": 1000,

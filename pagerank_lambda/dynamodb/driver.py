@@ -18,8 +18,6 @@ s3_client = boto3.client('s3')
 dynamodb = boto3.resource('dynamodb', region_name='us-west-2')
 db_name = 'jg-pagerank'
 table = dynamodb.Table(db_name)
-relation_name = 'jg-page-relation'
-relation_table = dynamodb.Table(relation_name)
 
 config = json.loads(open('driverconfig.json', 'r').read())
 
@@ -65,30 +63,14 @@ def invoke_lambda(pages_range, divided_page_num, iter, remain_page):
     )
 
 
-def scanRecursive(tableName, **kwargs):
-    """
-    NOTE: Anytime you are filtering by a specific equivalency attribute such as id, name
-    or date equal to ... etc., you should consider using a query not scan
-
-    kwargs are any parameters you want to pass to the scan operation
-    """
-    dbTable = dynamodb.Table(tableName)
-    response = dbTable.scan(**kwargs)
-    if kwargs.get('Select') == "COUNT":
-        return response.get('Count')
-    data = response.get('Items')
-    while 'LastEvaluatedKey' in response:
-        response = kwargs.get('table').scan(ExclusiveStartKey=response['LastEvaluatedKey'], **kwargs)
-        data.extend(response['Items'])
-    return data
+def get_s3_object(bucket, key):
+    response = s3_client.get_object(Bucket=bucket, Key=key)
+    return json.loads(response['Body'].read().decode())
 
 
 # page들의 관계 데이터셋을 만들어 반환하는 함수 입니다.
-def get_page_relation(t):
-    # response = t.scan()
-    # scanRecursive(t)
-    # print(response["Count"])
-    return scanRecursive(relation_name)
+def get_page_relation(file):
+    return get_s3_object(bucket, config['relationPrefix'] + config['pages'] + file)
 
 
 def dynamodb_remove_all_items():
@@ -113,28 +95,28 @@ l_pagerank = lambdautils.LambdaManager(lambda_client, s3_client, region, config[
 l_pagerank.update_code_or_create_on_noexist()
 
 # page의 관계들이 담겨있는 파일을 가지고 dictionary 관계 데이터셋을 만듭니다.
-page_relations = get_page_relation(relation_table)
+page_relations = get_page_relation('')
 # 모든 page의 초기 Rank값은 1/전체 페이지 수 의 값을 가집니다.
 pagerank_init = 1 / len(page_relations)
 
 
 # DynamoDB에 모든 페이지의 초기값들을 업로드 합니다.
-def init_iter(page):
+def init_iter(page, relation):
     # print('%s 번 page 진행 중...' % str(page['page']))
     table.put_item(
         Item={
             'iter': 0,
-            'page': str(page['page']),
+            'page': str(page),
             'rank': decimal.Decimal(str(pagerank_init)),
-            'relation_length': len(page['relation'])
+            'relation': relation
         }
     )
 
 
 init_return = []
-for page in page_relations:
+for page, relation in page_relations.items():
     init_t = Thread(target=init_iter,
-                    args=(page,))
+                    args=(page, relation,))
     init_t.start()
     init_return.append(init_t)
 for init_t in init_return:
@@ -146,7 +128,7 @@ removeZip(lambda_zip)
 iters = 25
 dampen_factor = 0.8
 remain_page = (1 - dampen_factor) / len(page_relations)
-divided_page_num = 100
+divided_page_num = 5
 pages_range = int(len(page_relations) / divided_page_num)
 last_range = len(page_relations) % divided_page_num
 
@@ -167,4 +149,4 @@ for iter in range(1, iters + 1):
         t_return.append(t)
     for t in t_return:
         t.join()
-    time.sleep(60)
+    time.sleep(10)

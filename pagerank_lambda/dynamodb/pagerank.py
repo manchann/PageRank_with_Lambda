@@ -11,9 +11,7 @@ s3 = boto3.resource('s3')
 s3_client = boto3.client('s3')
 dynamodb = boto3.resource('dynamodb')
 db_name = 'jg-pagerank'
-relation_name = 'jg-page-relation'
 rank_table = dynamodb.Table(db_name)
-relation_table = dynamodb.Table(relation_name)
 
 lambda_read_timeout = 300
 boto_max_connections = 1000
@@ -44,7 +42,7 @@ def invoke_lambda(page, iter, remain_page):
 
 
 def get_page_relation(t, page):
-    page_relation = t.get_item(Key={'page': page})
+    page_relation = t.get_item(Key={'iter': 0, 'page': page})
     return page_relation['Item']
 
 
@@ -58,13 +56,13 @@ def get_past_pagerank(t, iter, page_relation):
     return past_pagerank
 
 
-def put_dynamodb_items(page, iter, rank, relation_length):
+def put_dynamodb_items(page, iter, rank, relation):
     rank_table.put_item(
         Item={
             'iter': iter,
             'page': str(page),
             'rank': decimal.Decimal(str(rank)),
-            'relation_length': relation_length
+            'relation': relation
         }
     )
 
@@ -78,17 +76,17 @@ def ranking(page_relation, past_pageranks):
         for past in past_pageranks:
             if past['page'] == p:
                 past_rank = float(past['rank'])
-                leave_page += (past_rank / float(past['relation_length']))
+                leave_page += (past_rank / float(len(past['relation'])))
     leave_page *= dampen_factor
 
     return leave_page
 
 
 def each_page(page, iter, remain_page):
-    page_relation = get_page_relation(relation_table, page)
+    page_relation = get_page_relation(rank_table, page)
     past_pagerank = get_past_pagerank(rank_table, iter, page_relation)
     page_rank = ranking(page_relation, past_pagerank) + remain_page
-    put_dynamodb_items(page, iter, page_rank, len(page_relation['relation']))
+    put_dynamodb_items(page, iter, page_rank, page_relation['relation'])
 
 
 def lambda_handler(event, context):
