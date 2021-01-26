@@ -129,7 +129,7 @@ print('init 끝, 걸린 시간: ', time.time() - init_start)
 # 앞서 zip으로 만든 파일이 Lambda에 업로드 되었으므로 로컬에서의 zip파일을 삭제합니다.
 removeZip(lambda_zip)
 # 반복 횟수를 설정합니다.
-iters = 25
+iters = 3
 dampen_factor = 0.8
 remain_page = (1 - dampen_factor) / total_page_length
 divided_page_num = 10000
@@ -152,4 +152,4 @@ for iter in range(1, iters + 1):
         t_return.append(t)
     for t in t_return:
         t.join()
-    time.sleep(60)
+    time.sleep(400)
