@@ -62,7 +62,6 @@ def put_dynamodb_items(page, iter, rank, relation):
             'iter': iter,
             'page': str(page),
             'rank': decimal.Decimal(str(rank)),
-            'relation': relation
         }
     )
 
