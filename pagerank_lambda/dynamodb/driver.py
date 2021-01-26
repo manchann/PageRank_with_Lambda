@@ -1,6 +1,7 @@
 import json
 import boto3
 import glob
+import os
 import subprocess
 import lambdautils
 import decimal
@@ -84,7 +85,7 @@ def dynamodb_remove_all_items():
 
 
 # DynamoDB에 있는 모든 값을 지웁니다.
-# subprocess.call(['export', "serverless_mapreduce_role=arn:aws:iam::741926482963:role/biglambda_role"])
+os.system('export', "serverless_mapreduce_role=arn:aws:iam::741926482963:role/biglambda_role")
 
 dynamodb_remove_all_items()
 time.sleep(10)
