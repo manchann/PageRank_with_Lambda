@@ -84,3 +84,5 @@ for d in range(20):
         thread_list.append(t)
     for thr in thread_list:
         thr.join()
+
+    print('d번째 분할 끝')
