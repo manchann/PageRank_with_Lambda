@@ -31,7 +31,7 @@ def write_to_s3(bucket, key, data, metadata):
 
 
 # case: heavy data
-divided_page_num = 500
+divided_page_num = 1000
 page_file = s3_client.get_object(Bucket=bucket, Key=config["pages"])
 page_file = page_file['Body'].read().decode()
 
@@ -72,7 +72,7 @@ def get_page_relation(file, pages):
 # page의 관계들이 담겨있는 파일을 가지고 dictionary 관계 데이터셋을 만듭니다.
 thread_list = []
 
-for idx in range(500):
+for idx in range(150):
     t = Thread(target=get_page_relation, args=(idx, page_file,))
     t.start()
     thread_list.append(t)
