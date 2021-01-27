@@ -53,15 +53,16 @@ def get_page_relation(file, pages):
             value = value.replace("\r", "")
             if key == value:
                 continue
-            if key == str(page):
+            key_compared = int(key)
+            if key_compared == page:
                 if key not in page_relations:
                     page_relations[key] = []
                 if value not in page_relations[key]:
                     page_relations[key].append(value)
                     print(file + '번째 ' + key + ' ' + value + '완료')
-            elif int(key) > page:
+            elif key_compared > page:
                 page += 1
-            if key < page:
+            if key_compared < page:
                 break
         except:
             pass
