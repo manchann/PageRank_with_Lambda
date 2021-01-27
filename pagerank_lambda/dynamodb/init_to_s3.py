@@ -43,9 +43,9 @@ page_file = s3_client.get_object(Bucket=bucket, Key=config["pages"])
 # page들의 관계 데이터셋을 만들어 반환하는 함수 입니다.
 def get_page_relation(file, pages):
     page_relations = {}
-    print(pages)
     pages = pages['Body'].read().decode()
     lines = pages.split("\n")
+    print(lines)
     for line in lines:
         try:
             key = line.split("\t")[0]
