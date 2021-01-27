@@ -48,7 +48,6 @@ def get_page_relation(t, page):
 
 def get_past_pagerank(t, iter, page_relation):
     past_pagerank = []
-    print(page_relation['relation'])
     for page in page_relation['relation']:
         past_page_info = t.get_item(Key={'iter': iter - 1, 'page': str(page)})
         print('page', str(page))
