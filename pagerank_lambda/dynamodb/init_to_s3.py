@@ -35,6 +35,7 @@ divided_page_num = 1000
 page_file = s3_client.get_object(Bucket=bucket, Key=config["pages"])
 page_file = page_file['Body'].read().decode()
 
+
 # case: light data
 # p = s3_client.get_object(Bucket=bucket, Key=config['pages'])
 # pages_list.append(p)
@@ -72,7 +73,23 @@ def get_page_relation(file, pages):
 # page의 관계들이 담겨있는 파일을 가지고 dictionary 관계 데이터셋을 만듭니다.
 thread_list = []
 
-for idx in range(150):
+for idx in range(50):
+    t = Thread(target=get_page_relation, args=(idx, page_file,))
+    t.start()
+    thread_list.append(t)
+for thr in thread_list:
+    thr.join()
+
+thread_list = []
+
+for idx in range(50, 100):
+    t = Thread(target=get_page_relation, args=(idx, page_file,))
+    t.start()
+    thread_list.append(t)
+for thr in thread_list:
+    thr.join()
+
+for idx in range(100, 150):
     t = Thread(target=get_page_relation, args=(idx, page_file,))
     t.start()
     thread_list.append(t)
