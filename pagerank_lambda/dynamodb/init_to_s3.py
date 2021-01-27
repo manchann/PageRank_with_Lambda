@@ -46,6 +46,7 @@ def get_page_relation(file, pages):
     page_relations = {}
     lines = pages.split("\n")
     page = divided_page_num * idx
+    is_start = False
     for line in lines:
         try:
             key = line.split("\t")[0]
@@ -55,6 +56,7 @@ def get_page_relation(file, pages):
                 continue
             key_compared = int(key)
             if key_compared == page:
+                is_start = True
                 if key not in page_relations:
                     page_relations[key] = []
                 if value not in page_relations[key]:
@@ -62,7 +64,7 @@ def get_page_relation(file, pages):
                     print(file + '번째 ' + key + ' ' + value + '완료')
             elif key_compared > page:
                 page += 1
-            if key_compared < page:
+            if is_start == True and key_compared < page:
                 break
         except:
             pass
