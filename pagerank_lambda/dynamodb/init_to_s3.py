@@ -33,7 +33,7 @@ def write_to_s3(bucket, key, data, metadata):
 # case: heavy data
 divided_page_num = 500
 page_file = s3_client.get_object(Bucket=bucket, Key=config["pages"])
-
+page_file = page_file['Body'].read().decode()
 
 # case: light data
 # p = s3_client.get_object(Bucket=bucket, Key=config['pages'])
@@ -43,7 +43,7 @@ page_file = s3_client.get_object(Bucket=bucket, Key=config["pages"])
 # page들의 관계 데이터셋을 만들어 반환하는 함수 입니다.
 def get_page_relation(file, pages):
     page_relations = {}
-    pages = pages['Body'].read().decode()
+    # pages = pages['Body'].read().decode()
     print(pages)
     lines = pages.split("\n")
     print(lines)
