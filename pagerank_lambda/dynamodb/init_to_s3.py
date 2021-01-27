@@ -54,7 +54,7 @@ def get_page_relation(file, pages):
                 continue
             page = divided_page_num * idx
             while page < divided_page_num * (idx + 1):
-                if key == page:
+                if key == str(page):
                     if key not in page_relations:
                         page_relations[key] = []
                     if value not in page_relations[key]:
