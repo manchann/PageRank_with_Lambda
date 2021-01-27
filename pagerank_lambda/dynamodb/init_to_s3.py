@@ -59,6 +59,7 @@ def get_page_relation(file, pages):
                         page_relations[key] = []
                     if value not in page_relations[key]:
                         page_relations[key].append(value)
+                        print(file + '번째 ' + key + ' ' + value + '완료')
                 elif key > page:
                     page += 1
             break
@@ -78,5 +79,3 @@ for idx in range(10):
     thread_list.append(t)
 for thr in thread_list:
     thr.join()
-
-
