@@ -43,10 +43,7 @@ page_file = page_file['Body'].read().decode()
 # page들의 관계 데이터셋을 만들어 반환하는 함수 입니다.
 def get_page_relation(file, pages):
     page_relations = {}
-    # pages = pages['Body'].read().decode()
-    print(pages)
     lines = pages.split("\n")
-    print(lines)
     for line in lines:
         try:
             key = line.split("\t")[0]
@@ -75,7 +72,7 @@ def get_page_relation(file, pages):
 # page의 관계들이 담겨있는 파일을 가지고 dictionary 관계 데이터셋을 만듭니다.
 thread_list = []
 
-for idx in range(10):
+for idx in range(500):
     t = Thread(target=get_page_relation, args=(idx, page_file,))
     t.start()
     thread_list.append(t)
