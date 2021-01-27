@@ -59,7 +59,7 @@ def get_page_relation(file, pages):
                 if value not in page_relations[key]:
                     page_relations[key].append(value)
                     print(file + '번째 ' + key + ' ' + value + '완료')
-            elif key > page:
+            elif int(key) > page:
                 page += 1
             if key < page:
                 break
