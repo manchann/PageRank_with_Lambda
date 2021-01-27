@@ -69,7 +69,7 @@ def get_page_relation(file, pages):
                 break
         except:
             pass
-    write_to_s3(bucket, config['relationPrefix'] + config['pages'] + str(file) + '.txt',
+    write_to_s3(bucket, config['relationPrefix'] + str(file) + '.txt',
                 json.dumps(page_relations).encode(), {})
 
     return True
@@ -78,7 +78,7 @@ def get_page_relation(file, pages):
 # page의 관계들이 담겨있는 파일을 가지고 dictionary 관계 데이터셋을 만듭니다.
 thread_list = []
 
-for idx in range(100):
+for idx in range(10):
     t = Thread(target=get_page_relation, args=(idx, page_file,))
     t.start()
     thread_list.append(t)
