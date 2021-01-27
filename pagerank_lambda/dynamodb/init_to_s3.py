@@ -65,7 +65,7 @@ def get_page_relation(file, pages):
 
         except:
             pass
-    write_to_s3(bucket, config['relationPrefix'] + config['pages'] + file, json.dumps(page_relations).encode(), {})
+    write_to_s3(bucket, config['relationPrefix'] + config['pages'] + str(file), json.dumps(page_relations).encode(), {})
 
     return True
 
@@ -74,7 +74,7 @@ def get_page_relation(file, pages):
 thread_list = []
 
 for idx in range(500):
-    t = Thread(target=get_page_relation, args=(idx, page_file))
+    t = Thread(target=get_page_relation, args=(idx, page_file,))
     t.start()
     thread_list.append(t)
 for thr in thread_list:
