@@ -32,7 +32,7 @@ def write_to_s3(bucket, key, data, metadata):
 
 # case: heavy data
 divided_page_num = 500
-page_file = s3_client.get_object(Bucket=bucket, Key=config["page"])
+page_file = s3_client.get_object(Bucket=bucket, Key=config["pages"])
 
 
 # case: light data
