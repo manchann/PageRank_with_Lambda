@@ -56,7 +56,6 @@ def get_page_relation(file, pages):
                 continue
             key_compared = int(key)
             if key_compared == page:
-                print(page)
                 is_start = True
                 if key not in page_relations:
                     page_relations[key] = []
@@ -85,4 +84,4 @@ for d in range(20):
     for thr in thread_list:
         thr.join()
 
-    print('d번째 분할 끝')
+    print('----------------- d번째 분할 끝 -----------------')
