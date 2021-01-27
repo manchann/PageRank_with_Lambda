@@ -59,10 +59,9 @@ def get_page_relation(file, pages):
                         page_relations[key] = []
                     if value not in page_relations[key]:
                         page_relations[key].append(value)
-                    print(key, value)
                 elif key > page:
                     page += 1
-
+            break
         except:
             pass
     write_to_s3(bucket, config['relationPrefix'] + config['pages'] + str(file), json.dumps(page_relations).encode(), {})
