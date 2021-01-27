@@ -65,7 +65,7 @@ def get_page_relation(file, pages):
                     print(file + '번째 ' + key + ' ' + value + '완료')
             elif key_compared > page:
                 page += 1
-            if is_start == True and key_compared < page:
+            if is_start is True and key_compared < page:
                 break
         except:
             pass
@@ -77,7 +77,7 @@ def get_page_relation(file, pages):
 # page의 관계들이 담겨있는 파일을 가지고 dictionary 관계 데이터셋을 만듭니다.
 thread_list = []
 
-for idx in range(10):
+for idx in range(1):
     t = Thread(target=get_page_relation, args=(idx, page_file,))
     t.start()
     thread_list.append(t)
