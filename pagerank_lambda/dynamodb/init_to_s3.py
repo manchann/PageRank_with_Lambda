@@ -45,6 +45,7 @@ page_file = page_file['Body'].read().decode()
 def get_page_relation(file, pages):
     page_relations = {}
     lines = pages.split("\n")
+    page = divided_page_num * idx
     for line in lines:
         try:
             key = line.split("\t")[0]
@@ -52,17 +53,16 @@ def get_page_relation(file, pages):
             value = value.replace("\r", "")
             if key == value:
                 continue
-            page = divided_page_num * idx
-            while page < divided_page_num * (idx + 1):
-                if key == str(page):
-                    if key not in page_relations:
-                        page_relations[key] = []
-                    if value not in page_relations[key]:
-                        page_relations[key].append(value)
-                        print(file + '번째 ' + key + ' ' + value + '완료')
-                elif key > page:
-                    page += 1
-            break
+            if key == str(page):
+                if key not in page_relations:
+                    page_relations[key] = []
+                if value not in page_relations[key]:
+                    page_relations[key].append(value)
+                    print(file + '번째 ' + key + ' ' + value + '완료')
+            elif key > page:
+                page += 1
+            if key < page:
+                break
         except:
             pass
     write_to_s3(bucket, config['relationPrefix'] + config['pages'] + str(file), json.dumps(page_relations).encode(), {})
