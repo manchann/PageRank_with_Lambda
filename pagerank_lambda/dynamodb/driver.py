@@ -95,7 +95,8 @@ l_pagerank.update_code_or_create_on_noexist()
 # page의 관계들이 담겨있는 파일을 가지고 dictionary 관계 데이터셋을 만듭니다.
 page_relations = []
 total_page_length = 0
-for i in range(10):
+divided_page_num = 500
+for i in range(divided_page_num):
     page_relations.append(get_page_relation(str(i)))
     total_page_length += len(page_relations[i])
 # 모든 page의 초기 Rank값은 1/전체 페이지 수 의 값을 가집니다.
@@ -132,7 +133,6 @@ removeZip(lambda_zip)
 iters = 3
 dampen_factor = 0.8
 remain_page = (1 - dampen_factor) / total_page_length
-divided_page_num = 500
 pages_range = int(total_page_length / divided_page_num)
 last_range = total_page_length % divided_page_num
 
