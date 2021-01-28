@@ -50,7 +50,7 @@ def invoke_lambda(current_iter, end_iter, remain_page, file):
 
 def get_past_pagerank(t, page_relation):
     past_pagerank = []
-    for page in page_relation['relation']:
+    for page in page_relation:
         try:
             past_page_info = t.get_item(Key={'page': str(page)})
             print('page', str(page))
@@ -97,6 +97,7 @@ def each_page(page, page_relation, iter, remain_page):
 def invoke_init(page, page_relation, pagerank_init):
     put_dynamodb_items(page, 0, pagerank_init, len(page_relation))
     return True
+
 
 def lambda_handler(event, context):
     current_iter = event['current_iter']
