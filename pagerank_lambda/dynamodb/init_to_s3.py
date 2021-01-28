@@ -31,7 +31,7 @@ def write_to_s3(bucket, key, data, metadata):
 
 
 # case: heavy data
-divided_page_num = 1000
+divided_page_num = config["divided_page_num"]
 page_file = s3_client.get_object(Bucket=bucket, Key=config["pages"])
 page_file = page_file['Body'].read().decode()
 
@@ -68,8 +68,9 @@ def get_page_relation(file, pages):
                 break
         except:
             pass
-    write_to_s3(bucket, config['relationPrefix'] + str(file) + '.txt',
-                json.dumps(page_relations).encode(), {})
+    if len(page_relations) > 0:
+        write_to_s3(bucket, config['relationPrefix'] + str(file) + '.txt',
+                    json.dumps(page_relations).encode(), {})
 
     return True
 
@@ -84,4 +85,4 @@ for d in range(20):
     for thr in thread_list:
         thr.join()
 
-    print('----------------- ' + d + '번째 분할 끝 -----------------')
+    print('----------------- ' + str(d) + '번째 분할 끝 -----------------')
