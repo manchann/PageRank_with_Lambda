@@ -48,16 +48,8 @@ def invoke_lambda(current_iter, end_iter, remain_page, file):
     )
 
 
-def get_past_pagerank(t, page_relation):
-    past_pagerank = []
-    for page in page_relation:
-        try:
-            past_page_info = t.get_item(Key={'page': str(page)})
-            print('page', str(page))
-            print('past_page_info', past_page_info['Item'])
-            past_pagerank.append(past_page_info['Item'])
-        except:
-            pass
+def get_past_pagerank(t, page):
+    past_pagerank = t.get_item(Key={'page': str(page)})
     return past_pagerank
 
 
@@ -75,21 +67,18 @@ def put_dynamodb_items(page, iter, rank, relation_length):
 dampen_factor = 0.8
 
 
-def ranking(page_relation, past_pageranks):
+def ranking(page_relation):
     leave_page = 0
-    for p in page_relation:
-        for past in past_pageranks:
-            if past['page'] == p:
-                past_rank = float(past['rank'])
-                leave_page += (past_rank / float(past['relation_length']))
-    leave_page *= dampen_factor
+    for page in page_relation:
+        past_info = get_past_pagerank(rank_table, page)
+        leave_page += float(past_info['rank']) / float(past_info['relation_length'])
 
+    leave_page *= dampen_factor
     return leave_page
 
 
 def each_page(page, page_relation, iter, remain_page):
-    past_pagerank = get_past_pagerank(rank_table, page_relation)
-    page_rank = ranking(page_relation, past_pagerank) + remain_page
+    page_rank = ranking(page_relation) + remain_page
     put_dynamodb_items(page, iter, page_rank, len(page_relation))
     return True
 
