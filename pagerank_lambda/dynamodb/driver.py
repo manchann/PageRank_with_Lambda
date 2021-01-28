@@ -97,8 +97,8 @@ l_pagerank.update_code_or_create_on_noexist()
 page_relations = []
 total_page_length = 0
 divided_page_num = config["divided_page_num"]
-invoke_lambda_num = config["invoke_lambda_num"]
-for i in range(invoke_lambda_num + 1):
+invoked_lambda_num = config["invoked_lambda_num"]
+for i in range(invoked_lambda_num + 1):
     page_relations = get_s3_object(bucket, str(i))
     total_page_length += len(page_relations)
 # 모든 page의 초기 Rank값은 1/전체 페이지 수 의 값을 가집니다.
@@ -116,8 +116,8 @@ print('pages 분할 개수:', divided_page_num)
 
 # case DynamodbDB
 t_return = []
-for idx in range(invoke_lambda_num + 1):
-    t = Thread(target=invoke_lambda, args=(0, end_iter, remain_page, idx, pagerank_init))
+for idx in range(invoked_lambda_num + 1):
+    t = Thread(target=invoked_lambda, args=(0, end_iter, remain_page, idx, pagerank_init))
     t.start()
     t_return.append(t)
 for t in t_return:
