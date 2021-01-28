@@ -78,7 +78,6 @@ def dynamodb_remove_all_items():
     with table.batch_writer() as batch:
         for each in scan['Items']:
             batch.delete_item(Key={
-                'iter': each['iter'],
                 'page': each['page']
             })
 
