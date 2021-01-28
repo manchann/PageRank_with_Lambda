@@ -117,7 +117,7 @@ print('pages 분할 개수:', divided_page_num)
 # case DynamodbDB
 t_return = []
 for idx in range(invoked_lambda_num + 1):
-    t = Thread(target=invoked_lambda, args=(0, end_iter, remain_page, idx, pagerank_init))
+    t = Thread(target=invoke_lambda, args=(0, end_iter, remain_page, idx, pagerank_init))
     t.start()
     t_return.append(t)
 for t in t_return:
