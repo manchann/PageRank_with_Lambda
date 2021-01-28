@@ -50,7 +50,7 @@ def invoke_lambda(current_iter, end_iter, remain_page, file):
 
 def get_past_pagerank(t, page):
     past_pagerank = t.get_item(Key={'page': str(page)})
-    return past_pagerank
+    return past_pagerank['Item']
 
 
 def put_dynamodb_items(page, iter, rank, relation_length):
