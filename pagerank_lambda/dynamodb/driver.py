@@ -74,12 +74,15 @@ def get_page_relation(file):
 
 
 def dynamodb_remove_all_items():
-    scan = table.scan()
-    with table.batch_writer() as batch:
-        for each in scan['Items']:
-            batch.delete_item(Key={
-                'page': each['page']
-            })
+    try:
+        scan = table.scan()
+        with table.batch_writer() as batch:
+            for each in scan['Items']:
+                batch.delete_item(Key={
+                    'page': each['page']
+                })
+    except:
+        pass
 
 
 # DynamoDB에 있는 모든 값을 지웁니다.
