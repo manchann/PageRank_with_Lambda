@@ -99,10 +99,10 @@ def lambda_handler(event, context):
     try:
         pagerank_init = event['pagerank_init']
         for page, page_relation in page_relations.items():
-            invoke_init(page, page_relation, pagerank_init)
+            invoke_init(str(page), page_relation, pagerank_init)
     except:
         for page, page_relation in page_relations.items():
-            each_page(page, page_relation, current_iter, remain_page)
+            each_page(str(page), page_relation, current_iter, remain_page)
     if current_iter < end_iter:
         invoke_lambda(current_iter + 1, end_iter, remain_page, file)
     return True
