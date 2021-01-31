@@ -123,4 +123,3 @@ for idx in range(invoked_lambda_num + 1):
     t_return.append(t)
 for t in t_return:
     t.join()
-time.sleep(400)
