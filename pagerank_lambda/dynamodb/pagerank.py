@@ -98,7 +98,6 @@ def lambda_handler(event, context):
     page_relations = get_s3_object(bucket, file)
     try:
         pagerank_init = event['pagerank_init']
-        print(pagerank_init)
         for page, page_relation in page_relations.items():
             invoke_init(page, page_relation, pagerank_init)
     except:
