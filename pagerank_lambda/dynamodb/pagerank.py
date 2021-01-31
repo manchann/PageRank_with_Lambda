@@ -98,21 +98,11 @@ def lambda_handler(event, context):
     page_relations = get_s3_object(bucket, file)
     try:
         pagerank_init = event['pagerank_init']
-        t_return = []
         for page, page_relation in page_relations.items():
-            t = Thread(target=invoke_init, args=(page, page_relation, pagerank_init))
-            t.start()
-            t_return.append(t)
-        for t in t_return:
-            t.join()
+            invoke_init(page, page_relation, pagerank_init)
     except:
-        t_return = []
         for page, page_relation in page_relations.items():
-            t = Thread(target=each_page, args=(page, page_relation, current_iter, remain_page))
-            t.start()
-            t_return.append(t)
-        for t in t_return:
-            t.join()
+            each_page(page, page_relation, current_iter, remain_page)
     if current_iter < end_iter:
         invoke_lambda(current_iter + 1, end_iter, remain_page, file)
     return True
