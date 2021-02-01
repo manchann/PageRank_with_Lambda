@@ -64,7 +64,7 @@ def get_page_relation(file, pages):
                     print(file + '번째 ' + key + ' ' + value + '완료')
             elif key_compared > page:
                 page += 1
-            if is_start is True and page >= divided_page_num * (idx + 1):
+            if is_start is True and page >= divided_page_num * (file+ 1):
                 break
         except:
             pass
