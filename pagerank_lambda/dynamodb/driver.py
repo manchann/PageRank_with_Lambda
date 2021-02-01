@@ -105,7 +105,7 @@ invoked_lambda_num = config["invoked_lambda_num"]
 # 전체 페이지의 개수를 계산합니다.
 for i in range(invoked_lambda_num + 1):
     page_relations = get_s3_object(bucket, config['relationPrefix'] + str(i) + '.txt')
-    print(i, " ", len(page_relations))
+    print(i, " ", page_relations)
     total_page_length += len(page_relations)
 # 모든 page의 초기 Rank값은 1/(전체 페이지 수) 의 값을 가집니다.
 pagerank_init = 1 / total_page_length
