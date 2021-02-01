@@ -10,7 +10,7 @@
   "lambda_read_timeout": 300,
   "boto_max_connections": 1000,
   "divided_page_num": 1000,
-  "invoked_lambda_num": 106,
+  "invoked_lambda_num": 10,
   "lambda": {
     "name": "pagerank",
     "handler": "pagerank.lambda_handler",
