@@ -67,10 +67,11 @@ def put_dynamodb_items(page, iter, rank, relation_length):
 
 dampen_factor = 0.8
 
-
+#랭크를 계산합니다.
 def ranking(page_relation):
     leave_page = 0
     for page in page_relation:
+        #dynamodb에 올려져 있는 해당 페이지의 rank를 가져옵니다.
         past_info = get_past_pagerank(rank_table, page)
         print(past_info)
         leave_page += float(past_info['rank']) / float(past_info['relation_length'])
@@ -78,13 +79,14 @@ def ranking(page_relation):
     leave_page *= dampen_factor
     return leave_page
 
-
+#iter > 0 인 경우 실행 됩니다.
+#각각 페이지에 대하여 rank를 계산하고 dynamodb에 업데이트 합니다.
 def each_page(page, page_relation, iter, remain_page):
     page_rank = ranking(page_relation) + remain_page
     put_dynamodb_items(page, iter, page_rank, len(page_relation))
     return True
 
-
+#iter = 0 인 경우 실행 됩니다.
 def invoke_init(page, page_relation, pagerank_init):
     put_dynamodb_items(page, 0, pagerank_init, len(page_relation))
     return True
@@ -96,13 +98,16 @@ def lambda_handler(event, context):
     remain_page = event['remain_page']
     file = event['file']
     page_relations = get_s3_object(bucket, file)
+    #iter = 0 인경우
     try:
         pagerank_init = event['pagerank_init']
         for page, page_relation in page_relations.items():
             invoke_init(page, page_relation, pagerank_init)
+    #iter > 0 인경우
     except:
         for page, page_relation in page_relations.items():
             each_page(page, page_relation, current_iter, remain_page)
+    #current_iter = end_iter이 되기 전 까지 다음 iteration 람다를 invoke합니다.
     if current_iter < end_iter:
         invoke_lambda(current_iter + 1, end_iter, remain_page, file)
     return True
