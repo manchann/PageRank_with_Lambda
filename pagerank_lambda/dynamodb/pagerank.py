@@ -74,10 +74,12 @@ def ranking(page_relation):
     leave_page = 0
     for page in page_relation:
         # dynamodb에 올려져 있는 해당 페이지의 rank를 가져옵니다.
-        past_info = get_past_pagerank(rank_table, page)
-        print(past_info)
-        leave_page += float(past_info['rank']) / float(past_info['relation_length'])
-
+        try:
+            past_info = get_past_pagerank(rank_table, page)
+            print(past_info)
+            leave_page += float(past_info['rank']) / float(past_info['relation_length'])
+        except:
+            pass
     leave_page *= dampen_factor
     return leave_page
 
