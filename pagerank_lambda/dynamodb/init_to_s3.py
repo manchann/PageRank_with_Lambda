@@ -45,7 +45,7 @@ page_file = page_file['Body'].read().decode()
 def get_page_relation(file, pages):
     page_relations = {}
     lines = pages.split("\n")
-    page = divided_page_num * idx
+    page = divided_page_num * file
     is_start = False
     for line in lines:
         try:
