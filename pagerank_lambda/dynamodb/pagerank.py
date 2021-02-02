@@ -50,8 +50,6 @@ def invoke_lambda(current_iter, end_iter, remain_page, file):
 
 def get_past_pagerank(t, page):
     past_pagerank = t.get_item(Key={'page': str(page)})
-    print('page', str(page))
-    print(past_pagerank)
     return past_pagerank['Item']
 
 
@@ -78,7 +76,7 @@ def ranking(page_relation):
             past_info = get_past_pagerank(rank_table, page)
             leave_page += float(past_info['rank']) / float(past_info['relation_length'])
         except:
-            print('page', page)
+            print('error page', page)
             pass
     leave_page *= dampen_factor
     return leave_page
