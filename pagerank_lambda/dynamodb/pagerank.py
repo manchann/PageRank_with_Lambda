@@ -79,6 +79,7 @@ def ranking(page_relation):
             print(past_info)
             leave_page += float(past_info['rank']) / float(past_info['relation_length'])
         except:
+            print('page', page)
             pass
     leave_page *= dampen_factor
     return leave_page
