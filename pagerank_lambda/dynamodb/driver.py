@@ -140,12 +140,12 @@ print('pages 총 개수:', total_page_length)
 print('pages 분할 개수:', divided_page_num)
 
 # S3의 나뉘어진 파일 수 만큼 람다를 병렬적으로 Invoke합니다.
-t_return = []
-for idx in range(invoked_lambda_num + 1):
-    s3_file_path = config['relationPrefix'] + str(idx) + '.txt'
-    t = Thread(target=invoke_lambda,
-               args=(1, end_iter, remain_page, s3_file_path, pagerank_init))
-    t.start()
-    t_return.append(t)
-for t in t_return:
-    t.join()
+# t_return = []
+# for idx in range(invoked_lambda_num + 1):
+#     s3_file_path = config['relationPrefix'] + str(idx) + '.txt'
+#     t = Thread(target=invoke_lambda,
+#                args=(1, end_iter, remain_page, s3_file_path, pagerank_init))
+#     t.start()
+#     t_return.append(t)
+# for t in t_return:
+#     t.join()
