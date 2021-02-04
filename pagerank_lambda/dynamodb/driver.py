@@ -115,7 +115,7 @@ def init_iter(page):
 
 # 전체 페이지의 개수를 계산합니다.
 for i in range(invoked_lambda_num + 1):
-    page_relations.append(get_s3_object(bucket, config['relationPrefix'] + str(i) + '.txt'))
+    page_relations += get_s3_object(bucket, config['relationPrefix'] + str(i) + '.txt')
 total_pages = get_s3_object(bucket, config['relationPrefix'] + 'total_page.txt')
 total_page_length = len(total_pages)
 
