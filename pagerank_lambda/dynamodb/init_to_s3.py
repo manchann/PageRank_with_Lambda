@@ -35,10 +35,11 @@ divided_page_num = config["divided_page_num"]
 page_file = s3_client.get_object(Bucket=bucket, Key=config["pages"])
 page_file = page_file['Body'].read().decode()
 
-
 # case: light data
 # p = s3_client.get_object(Bucket=bucket, Key=config['pages'])
 # pages_list.append(p)
+
+total_pages = []
 
 
 # page들의 관계 데이터셋을 만들어 반환하는 함수 입니다.
@@ -61,10 +62,11 @@ def get_page_relation(file, pages):
                     page_relations[key] = []
                 if value not in page_relations[key]:
                     page_relations[key].append(value)
+                    total_pages.append(value)
                     print(file + '번째 ' + key + ' ' + value + '완료')
             elif key_compared > page:
                 page += 1
-            if is_start is True and page >= divided_page_num * (file+ 1):
+            if is_start is True and page >= divided_page_num * (file + 1):
                 break
         except:
             pass
@@ -86,3 +88,8 @@ for d in range(20):
         thr.join()
 
     print('----------------- ' + str(d) + '번째 분할 끝 -----------------')
+
+total_pages = set(total_pages)
+total_pages = list(total_pages)
+
+write_to_s3(bucket, 'total_page.txt', json.dumps(total_pages), {})
