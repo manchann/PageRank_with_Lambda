@@ -60,6 +60,7 @@ def get_page_relation(file, pages):
                 is_start = True
                 if key not in page_relations:
                     page_relations[key] = []
+                    total_pages.append(key)
                 if value not in page_relations[key]:
                     page_relations[key].append(value)
                     total_pages.append(value)
