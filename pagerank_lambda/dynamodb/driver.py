@@ -124,12 +124,14 @@ def init_iter(page):
 
 init_return = []
 for page in total_pages:
-    init_t = Thread(target=init_iter,
-                    args=(page,))
-    init_t.start()
-    init_return.append(init_t)
-for init_t in init_return:
-    init_t.join()
+    init_iter(page)
+# for page in total_pages:
+#     init_t = Thread(target=init_iter,
+#                     args=(page,))
+#     init_t.start()
+#     init_return.append(init_t)
+# for init_t in init_return:
+#     init_t.join()
 
 # 모든 page의 초기 Rank값은 1/(전체 페이지 수) 의 값을 가집니다.
 
