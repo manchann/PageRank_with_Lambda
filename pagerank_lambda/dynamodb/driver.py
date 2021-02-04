@@ -115,7 +115,7 @@ def init_iter(page):
             'iter': 0,
             'page': str(page),
             'rank': decimal.Decimal(str(pagerank_init)),
-            'relation_length': len(total_pages[page])
+            'relation_length': len(page_relations[page])
         }
     )
 
