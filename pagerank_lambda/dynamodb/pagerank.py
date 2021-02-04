@@ -90,27 +90,14 @@ def each_page(page, page_relation, iter, remain_page):
     return True
 
 
-# iter = 0 인 경우 실행 됩니다.
-def invoke_init(page, page_relation, pagerank_init):
-    put_dynamodb_items(page, 0, pagerank_init, len(page_relation))
-    return True
-
-
 def lambda_handler(event, context):
     current_iter = event['current_iter']
     end_iter = event['end_iter']
     remain_page = event['remain_page']
     file = event['file']
     page_relations = get_s3_object(bucket, file)
-    # iter = 0 인경우
-    try:
-        pagerank_init = event['pagerank_init']
-        for page, page_relation in page_relations.items():
-            invoke_init(page, page_relation, pagerank_init)
-    # iter > 0 인경우
-    except:
-        for page, page_relation in page_relations.items():
-            each_page(page, page_relation, current_iter, remain_page)
+    for page, page_relation in page_relations.items():
+        each_page(page, page_relation, current_iter, remain_page)
     # current_iter = end_iter이 되기 전 까지 다음 iteration 람다를 invoke합니다.
     if current_iter < end_iter:
         invoke_lambda(current_iter + 1, end_iter, remain_page, file)

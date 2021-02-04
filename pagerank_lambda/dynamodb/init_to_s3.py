@@ -92,4 +92,4 @@ for d in range(20):
 total_pages = set(total_pages)
 total_pages = list(total_pages)
 
-write_to_s3(bucket, 'total_page.txt', json.dumps(total_pages), {})
+write_to_s3(bucket, config['relationPrefix'] + 'total_page.txt', json.dumps(total_pages), {})

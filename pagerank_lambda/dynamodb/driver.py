@@ -97,9 +97,10 @@ l_pagerank.update_code_or_create_on_noexist()
 
 # page의 관계들이 담겨있는 파일을 가지고 dictionary 관계 데이터셋을 만듭니다.
 page_relations = []
-total_page_length = 0
 divided_page_num = config["divided_page_num"]
 invoked_lambda_num = config["invoked_lambda_num"]
+
+
 # DynamoDB에 모든 페이지의 초기값들을 업로드 합니다.
 def init_iter(page):
     print('%s 번 page 진행 중...' % str(page['page']))
@@ -108,27 +109,25 @@ def init_iter(page):
             'iter': 0,
             'page': str(page['page']),
             'rank': decimal.Decimal(str(pagerank_init)),
-            'relation_length': len(page['relation'])
+            'relation_length': len(total_pages[page])
         }
     )
 
 
+# 전체 페이지의 개수를 계산합니다.
+for i in range(invoked_lambda_num + 1):
+    page_relations = get_s3_object(bucket, config['relationPrefix'] + str(i) + '.txt')
+total_pages = get_s3_object(bucket, config['relationPrefix'] + 'total_page.txt')
+total_page_length = len(total_pages)
+
 init_return = []
-for page in page_relations:
+for page in total_pages:
     init_t = Thread(target=init_iter,
                     args=(page,))
     print('%s 번 page 진행 중...' % str(page['page']))
 for init_t in init_return:
     init_t.join()
 
-
-# 전체 페이지의 개수를 계산합니다.
-for i in range(invoked_lambda_num + 1):
-    page_relations = get_s3_object(bucket, config['relationPrefix'] + str(i) + '.txt')
-    for page, page_relation in page_relations.items():
-
-        print(i, " ", page)
-    total_page_length += len(page_relations)
 # 모든 page의 초기 Rank값은 1/(전체 페이지 수) 의 값을 가집니다.
 pagerank_init = 1 / total_page_length
 
@@ -147,7 +146,7 @@ t_return = []
 for idx in range(invoked_lambda_num + 1):
     s3_file_path = config['relationPrefix'] + str(idx) + '.txt'
     t = Thread(target=invoke_lambda,
-               args=(0, end_iter, remain_page, s3_file_path, pagerank_init))
+               args=(1, end_iter, remain_page, s3_file_path, pagerank_init))
     t.start()
     t_return.append(t)
 for t in t_return:
