@@ -124,7 +124,6 @@ init_return = []
 for page in total_pages:
     init_t = Thread(target=init_iter,
                     args=(page,))
-    print('%s 번 page 진행 중...' % str(page['page']))
 for init_t in init_return:
     init_t.join()
 
