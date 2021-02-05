@@ -135,6 +135,7 @@ init_return = []
 for page in total_pages:
     init_t = Thread(target=init_iter,
                     args=(page,))
+    print(page, '번째 페이지 init 시작')
     init_t.start()
     init_return.append(init_t)
 for init_t in init_return:
