@@ -100,5 +100,6 @@ def lambda_handler(event, context):
         each_page(page, page_relation, current_iter, remain_page)
     # current_iter = end_iter이 되기 전 까지 다음 iteration 람다를 invoke합니다.
     if current_iter < end_iter:
+        print(file, '범위', current_iter, '완료')
         invoke_lambda(current_iter + 1, end_iter, remain_page, file)
     return True
