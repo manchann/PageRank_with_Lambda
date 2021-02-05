@@ -140,6 +140,7 @@ for page in total_pages:
 for init_t in init_return:
     init_t.join()
 
+print('init 끝')
 # 모든 page의 초기 Rank값은 1/(전체 페이지 수) 의 값을 가집니다.
 
 # 앞서 zip으로 만든 파일이 Lambda에 업로드 되었으므로 로컬에서의 zip파일을 삭제합니다.
