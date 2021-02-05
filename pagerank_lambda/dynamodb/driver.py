@@ -103,36 +103,24 @@ invoked_lambda_num = config["invoked_lambda_num"]
 # 전체 페이지의 개수를 계산합니다.
 for i in range(invoked_lambda_num + 1):
     page_relations.update(get_s3_object(bucket, config['relationPrefix'] + str(i) + '.txt'))
-total_pages = get_s3_object(bucket, config['relationPrefix'] + 'total_page.txt')
-total_page_length = len(total_pages)
+total_page_length = len(page_relations)
 pagerank_init = 1 / total_page_length
 
 
 # DynamoDB에 모든 페이지의 초기값들을 업로드 합니다.
 def init_iter(page):
-    try:
-        relation_length = len(page_relations[page])
-        table.put_item(
-            Item={
-                'iter': 0,
-                'page': str(page),
-                'rank': decimal.Decimal(str(pagerank_init)),
-                'relation_length': len(page_relations[page])
-            }
-        )
-    except:
-        table.put_item(
-            Item={
-                'iter': 0,
-                'page': str(page),
-                'rank': decimal.Decimal(str(pagerank_init)),
-                'relation_length': 0
-            }
-        )
+    table.put_item(
+        Item={
+            'iter': 0,
+            'page': str(page),
+            'rank': decimal.Decimal(str(pagerank_init)),
+            'relation_length': len(page_relations[page])
+        }
+    )
 
 
 init_return = []
-for page in total_pages:
+for page, page_relation in page_relations.items():
     init_t = Thread(target=init_iter,
                     args=(page,))
     print(page, '번째 페이지 init 시작')
