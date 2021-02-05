@@ -53,14 +53,15 @@ def get_past_pagerank(t, page):
     return past_pagerank['Item']
 
 
-def put_dynamodb_items(page, iter, rank, relation_length, dynamodb_time):
+def put_dynamodb_items(page, iter, rank, relation_length, dynamodb_time, rank_time):
     rank_table.put_item(
         Item={
             'iter': iter,
             'page': str(page),
             'rank': decimal.Decimal(str(rank)),
             'relation_length': decimal.Decimal(str(relation_length)),
-            'dynamodb_time': decimal.Decimal(str(dynamodb_time))
+            'dynamodb_time': decimal.Decimal(str(dynamodb_time)),
+            'rank_time': decimal.Decimal(str(rank_time))
         }
     )
 
@@ -88,14 +89,15 @@ def ranking(page_relation):
 # iter > 0 인 경우 실행 됩니다.
 # 각각 페이지에 대하여 rank를 계산하고 dynamodb에 업데이트 합니다.
 def each_page(page, page_relation, iter, remain_page):
+    rank_start = time.time()
     rank, dynamodb_time = ranking(page_relation)
     page_rank = rank + remain_page
-    put_dynamodb_items(page, iter, page_rank, len(page_relation), dynamodb_time)
+    rank_time = time.time() - rank_start
+    put_dynamodb_items(page, iter, page_rank, len(page_relation), dynamodb_time, rank_time)
     return True
 
 
 def lambda_handler(event, context):
-    lambda_start = time.time()
     current_iter = event['current_iter']
     end_iter = event['end_iter']
     remain_page = event['remain_page']
@@ -107,5 +109,4 @@ def lambda_handler(event, context):
     if current_iter < end_iter:
         print(file, '범위', current_iter, '완료')
         invoke_lambda(current_iter + 1, end_iter, remain_page, file)
-    lambda_time = time.time() - lambda_start
     return True
