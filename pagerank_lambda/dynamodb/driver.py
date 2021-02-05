@@ -111,12 +111,13 @@ pagerank_init = 1 / total_page_length
 # DynamoDB에 모든 페이지의 초기값들을 업로드 합니다.
 def init_iter(page):
     try:
+        relation_length = len(page_relations[page])
         table.put_item(
             Item={
                 'iter': 0,
                 'page': str(page),
                 'rank': decimal.Decimal(str(pagerank_init)),
-                'relation_length': len(page_relations[str(page)])
+                'relation_length': len(page_relations[page])
             }
         )
     except:
