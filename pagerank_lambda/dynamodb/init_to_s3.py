@@ -82,9 +82,9 @@ def get_page_relation(file, pages):
 
     return True
 
-
-# page_file.sort(key=sort_by_destination)
-print(type(page_file))
+page_file = page_file.split("\n")
+page_file.sort(key=sort_by_destination)
+print(page_file)
 # # page의 관계들이 담겨있는 파일을 가지고 dictionary 관계 데이터셋을 만듭니다.
 # thread_list = []
 # for d in range(20):
