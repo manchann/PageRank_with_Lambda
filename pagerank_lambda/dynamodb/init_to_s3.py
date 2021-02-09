@@ -86,8 +86,8 @@ last_destination = page_file[-1].split("\t")[1].replace("\r", "")
 
 loop = last_destination / (divided_page_num * 10)
 print('총 반복 횟수: ', loop)
+start = time.time()
 for d in range(loop):
-    start = time.time()
     for idx in range(10 * d, 10 * (d + 1)):
         t = Thread(target=get_page_relation, args=(idx, page_file,))
         t.start()
@@ -96,4 +96,4 @@ for d in range(loop):
         thr.join()
 
     print('----------------- ' + str(d) + '번째 분할 끝 -----------------')
-    print('걸린 시간: ', time.time() - start)
+    print('현재까지 총 걸린 시간: ', time.time() - start)
