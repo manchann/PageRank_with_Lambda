@@ -67,7 +67,6 @@ def get_page_relation(file, pages):
                     total_pages.append(destination)
                 if source not in page_relations[destination]:
                     page_relations[destination].append(source)
-                    print(file + '번째 ' + destination + ' 목적지 ' + source + ' 출발지 완료')
             elif key_compared > page:
                 page += 1
             if is_start is True and page >= divided_page_num * (file + 1):
@@ -85,7 +84,7 @@ page_file = page_file.split("\n")
 page_file.sort(key=sort_by_destination)
 # page의 관계들이 담겨있는 파일을 가지고 dictionary 관계 데이터셋을 만듭니다.
 thread_list = []
-for d in range(1000):
+for d in range(3000):
     for idx in range(10 * d, 10 * (d + 1)):
         t = Thread(target=get_page_relation, args=(idx, page_file,))
         t.start()
