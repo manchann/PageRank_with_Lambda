@@ -51,10 +51,9 @@ def sort_by_destination(line):
 # page들의 관계 데이터셋을 만들어 반환하는 함수 입니다.
 def get_page_relation(file, pages):
     page_relations = {}
-    lines = pages.split("\n")
     page = divided_page_num * file
     is_start = False
-    for line in lines:
+    for line in pages:
         try:
             source = line.split("\t")[0]
             destination = line.split("\t")[1].replace("\r", "")
@@ -80,6 +79,7 @@ def get_page_relation(file, pages):
                     json.dumps(page_relations).encode(), {})
 
     return True
+
 
 page_file = page_file.split("\n")
 page_file.sort(key=sort_by_destination)
