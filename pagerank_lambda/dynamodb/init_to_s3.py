@@ -44,7 +44,7 @@ total_pages = []
 
 def sort_by_destination(line):
     line = line.split('\t')
-    destination = line[1].replace("\r", "")
+    destination = int(line[1].replace("\r", ""))
     return destination
 
 
@@ -63,9 +63,9 @@ def get_page_relation(file, pages):
             key_compared = int(destination)
             if key_compared == page:
                 is_start = True
-                if key not in page_relations:
-                    page_relations[key] = []
-                    total_pages.append(key)
+                if destination not in page_relations:
+                    page_relations[destination] = []
+                    total_pages.append(destination)
                 if value not in page_relations[key]:
                     page_relations[key].append(value)
                     total_pages.append(value)
