@@ -83,21 +83,21 @@ def get_page_relation(file, pages):
     return True
 
 
-page_file.sort(key=sort_by_destination)
-print(page_file)
-# page의 관계들이 담겨있는 파일을 가지고 dictionary 관계 데이터셋을 만듭니다.
-thread_list = []
-for d in range(20):
-    for idx in range(10 * d, 10 * (d + 1)):
-        t = Thread(target=get_page_relation, args=(idx, page_file,))
-        t.start()
-        thread_list.append(t)
-    for thr in thread_list:
-        thr.join()
-
-    print('----------------- ' + str(d) + '번째 분할 끝 -----------------')
-
-total_pages = set(total_pages)
-total_pages = list(total_pages)
-
-write_to_s3(bucket, config['relationPrefix'] + 'total_page.txt', json.dumps(total_pages), {})
+# page_file.sort(key=sort_by_destination)
+print(type(page_file))
+# # page의 관계들이 담겨있는 파일을 가지고 dictionary 관계 데이터셋을 만듭니다.
+# thread_list = []
+# for d in range(20):
+#     for idx in range(10 * d, 10 * (d + 1)):
+#         t = Thread(target=get_page_relation, args=(idx, page_file,))
+#         t.start()
+#         thread_list.append(t)
+#     for thr in thread_list:
+#         thr.join()
+#
+#     print('----------------- ' + str(d) + '번째 분할 끝 -----------------')
+#
+# total_pages = set(total_pages)
+# total_pages = list(total_pages)
+#
+# write_to_s3(bucket, config['relationPrefix'] + 'total_page.txt', json.dumps(total_pages), {})
