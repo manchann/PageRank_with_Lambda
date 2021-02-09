@@ -86,7 +86,6 @@ def ranking(page_relation):
     return leave_page, dynamodb_time
 
 
-# iter > 0 인 경우 실행 됩니다.
 # 각각 페이지에 대하여 rank를 계산하고 dynamodb에 업데이트 합니다.
 def each_page(page, page_relation, iter, remain_page):
     rank_start = time.time()

@@ -42,6 +42,12 @@ page_file = page_file['Body'].read().decode()
 total_pages = []
 
 
+def sort_by_destination(line):
+    line = line.split('\t')
+    destination = line[1].replace("\r", "")
+    return destination
+
+
 # page들의 관계 데이터셋을 만들어 반환하는 함수 입니다.
 def get_page_relation(file, pages):
     page_relations = {}
@@ -50,12 +56,11 @@ def get_page_relation(file, pages):
     is_start = False
     for line in lines:
         try:
-            key = line.split("\t")[0]
-            value = line.split("\t")[1]
-            value = value.replace("\r", "")
-            if key == value:
+            source = line.split("\t")[0]
+            destination = line.split("\t")[1].replace("\r", "")
+            if source == destination:
                 continue
-            key_compared = int(key)
+            key_compared = int(destination)
             if key_compared == page:
                 is_start = True
                 if key not in page_relations:
@@ -78,6 +83,8 @@ def get_page_relation(file, pages):
     return True
 
 
+page_file.sort(key=sort_by_destination)
+print(page_file)
 # page의 관계들이 담겨있는 파일을 가지고 dictionary 관계 데이터셋을 만듭니다.
 thread_list = []
 for d in range(20):
