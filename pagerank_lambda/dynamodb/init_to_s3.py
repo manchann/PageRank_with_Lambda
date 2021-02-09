@@ -35,11 +35,10 @@ divided_page_num = config["divided_page_num"]
 page_file = s3_client.get_object(Bucket=bucket, Key=config["pages"])
 page_file = page_file['Body'].read().decode()
 
+
 # case: light data
 # p = s3_client.get_object(Bucket=bucket, Key=config['pages'])
 # pages_list.append(p)
-
-total_pages = []
 
 
 def sort_by_destination(line):
@@ -64,7 +63,6 @@ def get_page_relation(file, pages):
                 is_start = True
                 if destination not in page_relations:
                     page_relations[destination] = []
-                    total_pages.append(destination)
                 if source not in page_relations[destination]:
                     page_relations[destination].append(source)
             elif key_compared > page:
@@ -84,7 +82,12 @@ page_file = page_file.split("\n")
 page_file.sort(key=sort_by_destination)
 # page의 관계들이 담겨있는 파일을 가지고 dictionary 관계 데이터셋을 만듭니다.
 thread_list = []
-for d in range(3000):
+last_destination = page_file[-1].split("\t")[1].replace("\r", "")
+
+loop = last_destination / (divided_page_num * 10)
+print('총 반복 횟수: ', loop)
+for d in range(loop):
+    start = time.time()
     for idx in range(10 * d, 10 * (d + 1)):
         t = Thread(target=get_page_relation, args=(idx, page_file,))
         t.start()
@@ -93,8 +96,4 @@ for d in range(3000):
         thr.join()
 
     print('----------------- ' + str(d) + '번째 분할 끝 -----------------')
-
-total_pages = set(total_pages)
-total_pages = list(total_pages)
-
-write_to_s3(bucket, config['relationPrefix'] + 'total_page.txt', json.dumps(total_pages), {})
+    print('걸린 시간: ', time.time() - start)

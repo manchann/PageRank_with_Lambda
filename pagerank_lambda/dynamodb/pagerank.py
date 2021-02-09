@@ -71,19 +71,16 @@ dampen_factor = 0.8
 
 # 랭크를 계산합니다.
 def ranking(page_relation):
-    leave_page = 0
+    leave_pagerank = 0
     dynamodb_time = 0
     for page in page_relation:
         # dynamodb에 올려져 있는 해당 페이지의 rank를 가져옵니다.
-        try:
-            dynamodb_start = time.time()
-            past_info = get_past_pagerank(rank_table, page)
-            dynamodb_time += time.time() - dynamodb_start
-            leave_page += float(past_info['rank']) / float(past_info['relation_length'])
-        except:
-            pass
-    leave_page *= dampen_factor
-    return leave_page, dynamodb_time
+        dynamodb_start = time.time()
+        past_info = get_past_pagerank(rank_table, page)
+        dynamodb_time += time.time() - dynamodb_start
+        leave_pagerank += float(past_info['rank']) / float(past_info['relation_length'])
+    leave_pagerank *= dampen_factor
+    return leave_pagerank, dynamodb_time
 
 
 # 각각 페이지에 대하여 rank를 계산하고 dynamodb에 업데이트 합니다.
