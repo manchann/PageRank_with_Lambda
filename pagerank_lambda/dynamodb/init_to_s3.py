@@ -84,7 +84,8 @@ page_file.sort(key=sort_by_destination)
 thread_list = []
 last_destination = page_file[-1].split("\t")[1].replace("\r", "")
 
-loop = last_destination / (divided_page_num * 10)
+loop = int(last_destination) / (divided_page_num * 10)
+loop = int(loop)
 print('총 반복 횟수: ', loop)
 start = time.time()
 for d in range(loop):
