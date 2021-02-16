@@ -71,20 +71,20 @@ dampen_factor = 0.8
 
 # 랭크를 계산합니다.
 def ranking(page_relation):
-    leave_pagerank = 0
+    rank = 0
     dynamodb_time = 0
     for page in page_relation:
         # dynamodb에 올려져 있는 해당 페이지의 rank를 가져옵니다.
         dynamodb_start = time.time()
         past_info = get_past_pagerank(rank_table, page)
         dynamodb_time += time.time() - dynamodb_start
-        leave_pagerank += float(past_info['rank']) / float(past_info['relation_length'])
-    leave_pagerank *= dampen_factor
-    return leave_pagerank, dynamodb_time
+        rank += float(past_info['rank']) / float(past_info['relation_length'])
+    rank *= dampen_factor
+    return rank, dynamodb_time
 
 
 # 각각 페이지에 대하여 rank를 계산하고 dynamodb에 업데이트 합니다.
-def each_page(page, page_relation, iter, remain_page):
+def ranking_each_page(page, page_relation, iter, remain_page):
     rank_start = time.time()
     rank, dynamodb_time = ranking(page_relation)
     page_rank = rank + remain_page
@@ -100,7 +100,7 @@ def lambda_handler(event, context):
     file = event['file']
     page_relations = get_s3_object(bucket, file)
     for page, page_relation in page_relations.items():
-        each_page(page, page_relation, current_iter, remain_page)
+        ranking_each_page(page, page_relation, current_iter, remain_page)
     # current_iter = end_iter이 되기 전 까지 다음 iteration 람다를 invoke합니다.
     if current_iter < end_iter:
         print(file, '범위', current_iter, '완료')
