@@ -69,8 +69,10 @@ def get_page_relation(file, pages):
             elif key_compared > page:
                 page += 1
             if is_start is True and page >= divided_page_num * (file + 1):
+                print(page)
                 break
         except:
+            print('test')
             pass
     if len(page_relations) > 0:
         write_to_s3(bucket, config['relationPrefix'] + str(file) + '.txt',
