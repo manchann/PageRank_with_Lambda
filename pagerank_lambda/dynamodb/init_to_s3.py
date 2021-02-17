@@ -43,6 +43,7 @@ page_file = page_file['Body'].read().decode()
 
 def sort_by_destination(line):
     line = line.split('\t')
+    print(line)
     destination = int(line[1].replace("\r", ""))
     return destination
 
