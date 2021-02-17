@@ -84,8 +84,6 @@ def get_page_relation(file, pages):
 
 page_file = page_file.split("\n")
 for idx in range(len(page_file)):
-    print(page_file[idx])
-    time.sleep(1)
     if len(page_file[idx]) == 0:
         del page_file[idx]
 page_file.sort(key=sort_by_destination)
@@ -96,7 +94,11 @@ print('last_destination: ', last_destination)
 loop = int(last_destination) / (divided_page_num * 10)
 loop = int(loop)
 print('총 반복 횟수: ', loop)
+for idx in range(len(page_file)):
+    print(page_file[idx])
+    time.sleep(1)
 start = time.time()
+
 for d in range(5):
     for idx in range(10 * d, 10 * (d + 1)):
         t = Thread(target=get_page_relation, args=(idx, page_file,))
