@@ -60,8 +60,6 @@ def get_page_relation(file, pages):
             if source == destination:
                 continue
             key_compared = int(destination)
-            print('des: ', key_compared)
-            print('page: ', page)
             if key_compared == page:
                 is_start = True
                 if destination not in page_relations:
