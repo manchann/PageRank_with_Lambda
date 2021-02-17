@@ -52,15 +52,11 @@ def get_page_relation(file, pages):
     page_relations = {}
     page = divided_page_num * file
     is_start = False
-    print(pages)
-    for idx in range(len(pages)):
-        print(pages[idx])
-        time.sleep(0.1)
     for line in pages:
         try:
             source = line.split("\t")[0]
             destination = line.split("\t")[1].replace("\r", "")
-            if destination < 3000 and destination > 2000:
+            if int(destination) < 3000 and int(destination) > 2000:
                 print('des', destination)
             if source == destination:
                 continue
