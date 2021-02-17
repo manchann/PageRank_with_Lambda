@@ -59,6 +59,8 @@ def get_page_relation(file, pages):
             if file == 1:
                 print('page', page)
                 print('des', destination)
+                if destination > 1000 and destination < 2000:
+                    print('des', destination)
             if source == destination:
                 continue
             key_compared = int(destination)
