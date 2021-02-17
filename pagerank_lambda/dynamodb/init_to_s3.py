@@ -94,7 +94,7 @@ loop = int(last_destination) / (divided_page_num * 10)
 loop = int(loop)
 print('총 반복 횟수: ', loop)
 start = time.time()
-for d in range(1):
+for d in range(5):
     for idx in range(10 * d, 10 * (d + 1)):
         t = Thread(target=get_page_relation, args=(idx, page_file,))
         t.start()
