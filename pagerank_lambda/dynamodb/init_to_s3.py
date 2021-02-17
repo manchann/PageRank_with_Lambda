@@ -58,8 +58,6 @@ def get_page_relation(file, pages):
             destination = line.split("\t")[1].replace("\r", "")
             if page == 1000:
                 print('page', page)
-            if int(destination) < 3000 and int(destination) > 2000:
-                print('des', destination)
             if source == destination:
                 continue
             key_compared = int(destination)
