@@ -43,7 +43,6 @@ page_file = page_file['Body'].read().decode()
 
 def sort_by_destination(line):
     line = line.split('\t')
-    print(line)
     destination = int(line[1].replace("\r", ""))
     return destination
 
@@ -60,6 +59,7 @@ def get_page_relation(file, pages):
             if source == destination:
                 continue
             key_compared = int(destination)
+            print(key_compared)
             if key_compared == page:
                 is_start = True
                 if destination not in page_relations:
@@ -86,7 +86,6 @@ for idx in range(len(page_file)):
     if page_file[idx] == '':
         del page_file[idx]
 page_file.sort(key=sort_by_destination)
-print(page_file)
 # page의 관계들이 담겨있는 파일을 가지고 dictionary 관계 데이터셋을 만듭니다.
 thread_list = []
 last_destination = page_file[-1].split("\t")[1].replace("\r", "")
@@ -95,7 +94,7 @@ loop = int(last_destination) / (divided_page_num * 10)
 loop = int(loop)
 print('총 반복 횟수: ', loop)
 start = time.time()
-for d in range(loop):
+for d in range(1):
     for idx in range(10 * d, 10 * (d + 1)):
         t = Thread(target=get_page_relation, args=(idx, page_file,))
         t.start()
