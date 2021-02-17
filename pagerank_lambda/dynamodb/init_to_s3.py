@@ -59,7 +59,6 @@ def get_page_relation(file, pages):
             if source == destination:
                 continue
             key_compared = int(destination)
-            print(page)
             if key_compared == page:
                 is_start = True
                 if destination not in page_relations:
@@ -72,9 +71,9 @@ def get_page_relation(file, pages):
                 print(page)
                 break
         except:
-            print('test')
             pass
     if len(page_relations) > 0:
+        print('page: ', page)
         write_to_s3(bucket, config['relationPrefix'] + str(file) + '.txt',
                     json.dumps(page_relations).encode(), {})
 
