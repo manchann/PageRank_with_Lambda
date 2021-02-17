@@ -147,7 +147,7 @@ print('pages 분할 개수:', divided_page_num)
 
 # S3의 나뉘어진 파일 수 만큼 람다를 병렬적으로 Invoke합니다.
 t_return = []
-for idx in range(invoked_lambda_num + 1):
+for idx in range(102 + 1):
     s3_file_path = config['relationPrefix'] + str(idx) + '.txt'
     print(idx, '번째 invoking')
     t = Thread(target=invoke_lambda,
