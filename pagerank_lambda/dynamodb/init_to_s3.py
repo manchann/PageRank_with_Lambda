@@ -58,7 +58,6 @@ def get_page_relation(file, pages):
             destination = line.split("\t")[1].replace("\r", "")
             if file == 1:
                 print('page', page)
-                print('des', destination)
                 if destination > 1000 and destination < 2000:
                     print('des', destination)
             if source == destination:
