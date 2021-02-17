@@ -42,10 +42,13 @@ page_file = page_file['Body'].read().decode()
 
 
 def sort_by_destination(line):
-    line = line.split('\t')
-    print(line)
-    destination = int(line[1].replace("\r", ""))
-    return destination
+    try:
+        line = line.split('\t')
+        print(line)
+        destination = int(line[1].replace("\r", ""))
+        return destination
+    except:
+        pass
 
 
 # page들의 관계 데이터셋을 만들어 반환하는 함수 입니다.
