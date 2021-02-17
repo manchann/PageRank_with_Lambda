@@ -56,6 +56,8 @@ def get_page_relation(file, pages):
         try:
             source = line.split("\t")[0]
             destination = line.split("\t")[1].replace("\r", "")
+            print('source', source)
+            print('des', destination)
             if source == destination:
                 continue
             key_compared = int(destination)
