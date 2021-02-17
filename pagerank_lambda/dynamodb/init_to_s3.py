@@ -60,6 +60,7 @@ def get_page_relation(file, pages):
                 continue
             key_compared = int(destination)
             if key_compared == page:
+                print(page)
                 is_start = True
                 if destination not in page_relations:
                     page_relations[destination] = []
