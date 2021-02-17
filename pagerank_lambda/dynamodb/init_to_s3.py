@@ -84,7 +84,7 @@ def get_page_relation(file, pages):
 
 page_file = page_file.split("\n")
 for idx in range(len(page_file)):
-    if page_file[idx] == '':
+    if len(page_file[idx]) == 0:
         del page_file[idx]
 page_file.sort(key=sort_by_destination)
 # page의 관계들이 담겨있는 파일을 가지고 dictionary 관계 데이터셋을 만듭니다.
