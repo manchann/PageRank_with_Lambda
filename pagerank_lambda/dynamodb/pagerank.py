@@ -50,6 +50,7 @@ def invoke_lambda(current_iter, end_iter, remain_page, file):
 
 def get_past_pagerank(t, page):
     past_pagerank = t.get_item(Key={'page': str(page)})
+    print('page: ', page)
     return past_pagerank['Item']
 
 
