@@ -84,6 +84,7 @@ for idx in range(len(page_file)):
     if len(page_file[idx]) < 2:
         del page_file[idx]
 page_file.sort(key=sort_by_destination)
+print(page_file)
 # page의 관계들이 담겨있는 파일을 가지고 dictionary 관계 데이터셋을 만듭니다.
 thread_list = []
 last_destination = page_file[-1].split("\t")[1].replace("\r", "")
