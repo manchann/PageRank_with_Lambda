@@ -96,7 +96,7 @@ loop = int(loop)
 print('총 반복 횟수: ', loop)
 for idx in range(len(page_file)):
     print(page_file[idx])
-    time.sleep(1)
+    time.sleep(0.1)
 start = time.time()
 
 for d in range(5):
