@@ -56,6 +56,7 @@ def get_page_relation(file, pages):
         try:
             source = line.split("\t")[0]
             destination = line.split("\t")[1].replace("\r", "")
+            print('page',page)
             if int(destination) < 3000 and int(destination) > 2000:
                 print('des', destination)
             if source == destination:
