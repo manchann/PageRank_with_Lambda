@@ -56,15 +56,12 @@ def get_page_relation(file, pages):
         try:
             source = line.split("\t")[0]
             destination = line.split("\t")[1].replace("\r", "")
-            if file == 1:
-                print('page', page)
-                if destination > 1000 and destination < 2000:
-                    print('des', destination)
+            if destination < 3000 and destination > 2000:
+                print('des', destination)
             if source == destination:
                 continue
             key_compared = int(destination)
             if key_compared == page:
-                print(page)
                 is_start = True
                 if destination not in page_relations:
                     page_relations[destination] = []
