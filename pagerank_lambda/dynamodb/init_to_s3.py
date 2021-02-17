@@ -81,7 +81,7 @@ def get_page_relation(file, pages):
 
 page_file = page_file.split("\n")
 for idx in range(len(page_file)):
-    if len(page_file[idx]) < 2:
+    if page_file[idx] == '':
         del page_file[idx]
 page_file.sort(key=sort_by_destination)
 print(page_file)
