@@ -52,6 +52,10 @@ def get_page_relation(file, pages):
     page_relations = {}
     page = divided_page_num * file
     is_start = False
+    print(pages)
+    for idx in range(len(pages)):
+        print(pages[idx])
+        time.sleep(0.1)
     for line in pages:
         try:
             source = line.split("\t")[0]
@@ -94,9 +98,6 @@ print('last_destination: ', last_destination)
 loop = int(last_destination) / (divided_page_num * 10)
 loop = int(loop)
 print('총 반복 횟수: ', loop)
-for idx in range(len(page_file)):
-    print(page_file[idx])
-    time.sleep(0.1)
 start = time.time()
 
 for d in range(5):
