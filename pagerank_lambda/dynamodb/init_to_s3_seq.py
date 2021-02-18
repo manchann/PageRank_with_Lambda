@@ -53,8 +53,8 @@ def sort_by_destination(line):
 # page들의 관계 데이터셋을 만들어 반환하는 함수 입니다.
 def get_page_relation(file, pages):
     page_relations = {}
-    page = divided_page_num * file
-    is_start = False
+    file = 0
+    page = 0
     for line in pages:
         try:
             source = line.split("\t")[0]
@@ -62,26 +62,18 @@ def get_page_relation(file, pages):
             if source == destination:
                 continue
             key_compared = int(destination)
-            while key_compared > page:
-                page += 1
-            if is_start is True and page >= divided_page_num * (file + 1):
-                break
             if key_compared == page:
-                is_start = True
                 if destination not in page_relations:
                     page_relations[destination] = []
                 if source not in page_relations[destination]:
                     page_relations[destination].append(source)
+                    page += 1
         except:
             pass
-    if file == 490:
-        print(page_relations)
-    if len(page_relations) > 0:
-        write_to_s3(bucket, config['relationPrefix'] + str(file) + '.txt',
-                    json.dumps(page_relations).encode(), {})
-
-    return True
-
+        if len(page_relations) > 0:
+            print('page: ', page)
+            write_to_s3(bucket, config['relationPrefix'] + str(file) + '.txt',
+                        json.dumps(page_relations).encode(), {})
 
 page_file = page_file.split("\n")
 # for idx in range(len(page_file)):
@@ -96,14 +88,3 @@ loop = int(last_destination) / (divided_page_num * 10)
 loop = int(loop)
 print('총 반복 횟수: ', loop)
 start = time.time()
-
-for d in range(loop):
-    for idx in range(10 * d, 10 * (d + 1)):
-        t = Thread(target=get_page_relation, args=(idx, page_file,))
-        t.start()
-        thread_list.append(t)
-    for thr in thread_list:
-        thr.join()
-
-    print('----------------- ' + str(d) + '번째 분할 끝 -----------------')
-    print('현재까지 총 걸린 시간: ', time.time() - start)
