@@ -35,10 +35,11 @@ divided_page_num = config["divided_page_num"]
 page_file = s3_client.get_object(Bucket=bucket, Key=config["pages"])
 page_file = page_file['Body'].read().decode()
 
-
 # case: light data
 # p = s3_client.get_object(Bucket=bucket, Key=config['pages'])
 # pages_list.append(p)
+
+total_pages = []
 
 
 def sort_by_destination(line):
@@ -70,8 +71,10 @@ def get_page_relation(file, pages):
                 is_start = True
                 if destination not in page_relations:
                     page_relations[destination] = []
+                    total_pages.append(destination)
                 if source not in page_relations[destination]:
                     page_relations[destination].append(source)
+                    total_pages.append(source)
         except:
             pass
     if file == 490:
@@ -107,3 +110,8 @@ for d in range(loop):
 
     print('----------------- ' + str(d) + '번째 분할 끝 -----------------')
     print('현재까지 총 걸린 시간: ', time.time() - start)
+
+total_pages = set(total_pages)
+total_pages = list(total_pages)
+
+write_to_s3(bucket, config['relationPrefix'] + 'total_page.txt', json.dumps(total_pages), {})
