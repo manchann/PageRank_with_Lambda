@@ -158,6 +158,9 @@ print('pages 분할 개수:', divided_page_num)
 #     t.join()
 
 for idx in range(invoked_lambda_num + 1):
-    s3_file_path = config['relationPrefix'] + str(idx) + '.txt'
-    print(idx, '번째 invoking')
-    invoke_lambda(1, end_iter, remain_page, s3_file_path, pagerank_init)
+    try:
+        s3_file_path = config['relationPrefix'] + str(idx) + '.txt'
+        print(idx, '번째 invoking')
+        invoke_lambda(1, end_iter, remain_page, s3_file_path, pagerank_init)
+    except:
+        pass
