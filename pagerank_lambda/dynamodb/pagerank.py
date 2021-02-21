@@ -54,15 +54,16 @@ def get_past_pagerank(t, page):
     return past_pagerank['Item']
 
 
-def put_dynamodb_items(page, iter, rank, relation_length, dynamodb_time, rank_time):
+def put_dynamodb_items(page, iter, rank, relation_length, get_time, rank_time, put_time):
     rank_table.put_item(
         Item={
             'iter': iter,
             'page': str(page),
             'rank': decimal.Decimal(str(rank)),
             'relation_length': decimal.Decimal(str(relation_length)),
-            'dynamodb_time': decimal.Decimal(str(dynamodb_time)),
-            'rank_time': decimal.Decimal(str(rank_time))
+            'get_time': decimal.Decimal(str(get_time)),
+            'rank_time': decimal.Decimal(str(rank_time)),
+            'put_time': decimal.Decimal(str(put_time))
         }
     )
 
@@ -87,10 +88,13 @@ def ranking(page_relation):
 # 각각 페이지에 대하여 rank를 계산하고 dynamodb에 업데이트 합니다.
 def ranking_each_page(page, page_relation, iter, remain_page):
     rank_start = time.time()
-    rank, dynamodb_time = ranking(page_relation)
+    rank, get_time = ranking(page_relation)
     page_rank = rank + remain_page
     rank_time = time.time() - rank_start
-    put_dynamodb_items(page, iter, page_rank, len(page_relation), dynamodb_time, rank_time)
+    put_start = time.time()
+    put_dynamodb_items(page, iter, page_rank, len(page_relation), 0, 0, 0)
+    put_time = time.time() - put_start
+    put_dynamodb_items(page, iter, page_rank, len(page_relation), get_time, rank_time, put_time)
     return True
 
 
