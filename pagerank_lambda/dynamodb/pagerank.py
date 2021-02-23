@@ -50,20 +50,16 @@ def invoke_lambda(current_iter, end_iter, remain_page, file):
 
 def get_past_pagerank(t, page):
     past_pagerank = t.get_item(Key={'page': str(page)})
-    print('page: ', page)
     return past_pagerank['Item']
 
 
-def put_dynamodb_items(page, iter, rank, relation_length, get_time, rank_time, put_time):
+def put_dynamodb_items(page, iter, rank, relation_length):
     rank_table.put_item(
         Item={
             'iter': iter,
             'page': str(page),
             'rank': decimal.Decimal(str(rank)),
-            'relation_length': decimal.Decimal(str(relation_length)),
-            'get_time': decimal.Decimal(str(get_time)),
-            'rank_time': decimal.Decimal(str(rank_time)),
-            'put_time': decimal.Decimal(str(put_time))
+            'relation_length': decimal.Decimal(str(relation_length))
         }
     )
 
@@ -92,10 +88,9 @@ def ranking_each_page(page, page_relation, iter, remain_page):
     page_rank = rank + remain_page
     rank_time = time.time() - rank_start
     put_start = time.time()
-    put_dynamodb_items(page, iter, page_rank, len(page_relation), 0, 0, 0)
+    put_dynamodb_items(page, iter, page_rank, len(page_relation))
     put_time = time.time() - put_start
-    put_dynamodb_items(page, iter, page_rank, len(page_relation), get_time, rank_time, put_time)
-    return True
+    return {'iter': iter, 'page': page, 'get_time': get_time, 'rank_time': rank_time, 'put_time': put_time}
 
 
 def lambda_handler(event, context):
@@ -106,10 +101,10 @@ def lambda_handler(event, context):
     page_relations = get_s3_object(bucket, file)
     try:
         for page, page_relation in page_relations.items():
-            ranking_each_page(page, page_relation, current_iter, remain_page)
+            ranking_result = ranking_each_page(page, page_relation, current_iter, remain_page)
+            print(ranking_result)
         # current_iter = end_iter이 되기 전 까지 다음 iteration 람다를 invoke합니다.
         if current_iter < end_iter:
-            print(file, '범위', current_iter, '번째 완료')
             invoke_lambda(current_iter + 1, end_iter, remain_page, file)
     except:
         pass
