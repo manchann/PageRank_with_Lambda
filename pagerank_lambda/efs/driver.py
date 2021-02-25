@@ -74,7 +74,7 @@ def get_page_relation(file):
     return get_s3_object(bucket, config['relationPrefix'] + file)
 
 
-zipLambda(lambda_name, lambda_zip)
+# zipLambda(lambda_name, lambda_zip)
 l_pagerank = lambdautils.LambdaManager(lambda_client, s3_client, region, config["lambda"]["zip"], lambda_name,
                                        config["lambda"]["handler"])
 l_pagerank.update_code_or_create_on_noexist()
@@ -124,7 +124,7 @@ print('init 끝')
 # 모든 page의 초기 Rank값은 1/(전체 페이지 수) 의 값을 가집니다.
 
 # 앞서 zip으로 만든 파일이 Lambda에 업로드 되었으므로 로컬에서의 zip파일을 삭제합니다.
-removeZip(lambda_zip)
+# removeZip(lambda_zip)
 # 반복 횟수를 설정합니다.
 end_iter = 10
 dampen_factor = 0.8
