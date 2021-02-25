@@ -114,11 +114,13 @@ def init_iter(page):
 init_return = []
 for page in total_pages:
     page = int(page)
+    pagerank_init = str(pagerank_init)
     with open(rank_path, 'r+b', 0) as f:
         # file lock : start_byte 부터 10개의 byte 범위를 lock
         fcntl.lockf(f, fcntl.LOCK_EX, 10, page, 1)
-        f.seek(page * 10)
-        f.write(pagerank_init)
+        for idx in range(page, page + 10):
+            f.seek(page * idx)
+            f.write(pagerank_init[idx])
         # file lock : start_byte 부터 10개의 byte 범위를 unlock
         fcntl.lockf(f, fcntl.LOCK_UN, page, 1)
         f.close()
