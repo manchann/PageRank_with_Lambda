@@ -13,7 +13,7 @@
   "invoked_lambda_num": 4840,
   "lambda": {
     "name": "jg-efs-pagerank",
-    "handler": "pagerank.lambda_handler",
+    "handler": "jg-efs-pagerank.lambda_handler",
     "zip": "jg-efs-pagerank.zip"
   }
 }
