@@ -12,8 +12,8 @@
   "divided_page_num": 1000,
   "invoked_lambda_num": 4840,
   "lambda": {
-    "name": "efs-pagerank",
+    "name": "pagerank",
     "handler": "pagerank.lambda_handler",
-    "zip": "efs-pagerank.zip"
+    "zip": "pagerank.zip"
   }
 }
