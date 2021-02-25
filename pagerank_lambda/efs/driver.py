@@ -100,6 +100,7 @@ rank_path = '/mnt/efs/' + 'rank_file'
 
 # DynamoDB에 모든 페이지의 초기값들을 업로드 합니다.
 def init_iter(page):
+    page = int(page)
     with open(rank_path, 'r+b', 0) as f:
         # file lock : start_byte 부터 10개의 byte 범위를 lock
         fcntl.lockf(f, fcntl.LOCK_EX, 10, page, 1)
