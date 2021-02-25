@@ -50,7 +50,7 @@ def invoke_lambda(current_iter, end_iter, remain_page, file):
     )
 
 
-def get_past_pagerank(t, page):
+def get_past_pagerank(page):
     page = int(page)
     rank = ''
     with open(rank_path, 'r+b', 0) as f:
@@ -86,9 +86,10 @@ def ranking(page_relation):
     for page in page_relation:
         # dynamodb에 올려져 있는 해당 페이지의 rank를 가져옵니다.
         get_start = time.time()
-        past_info = get_past_pagerank(rank_table, page)
+        past_info = get_past_pagerank(page)
         get_time += time.time() - get_start
-        rank += float(past_info['rank']) / float(past_info['relation_length'])
+        # rank += float(past_info['rank']) / float(past_info['relation_length'])
+        rank += float(past_info)
     rank *= dampen_factor
     return rank, get_time
 
