@@ -19,7 +19,7 @@ boto_max_connections = 1000
 lambda_config = Config(read_timeout=lambda_read_timeout, max_pool_connections=boto_max_connections)
 lambda_client = boto3.client('lambda', config=lambda_config)
 lambda_name = 'pagerank'
-bucket = "jg-pagerank-bucket"
+bucket = "jg-pagerank-bucket2"
 rank_path = '/mnt/efs/' + 'rank_file'
 
 
