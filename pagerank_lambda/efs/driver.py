@@ -75,9 +75,9 @@ def get_page_relation(file):
 
 
 # zipLambda(lambda_name, lambda_zip)
-l_pagerank = lambdautils.LambdaManager(lambda_client, s3_client, region, config["lambda"]["zip"], lambda_name,
-                                       config["lambda"]["handler"])
-l_pagerank.update_code_or_create_on_noexist()
+# l_pagerank = lambdautils.LambdaManager(lambda_client, s3_client, region, config["lambda"]["zip"], lambda_name,
+#                                        config["lambda"]["handler"])
+# l_pagerank.update_code_or_create_on_noexist()
 
 # page의 관계들이 담겨있는 파일을 가지고 dictionary 관계 데이터셋을 만듭니다.
 # page_relations = {}
