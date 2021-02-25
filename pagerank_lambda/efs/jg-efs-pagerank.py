@@ -61,19 +61,23 @@ def get_past_pagerank(page):
         # file lock : start_byte 부터 10개의 byte 범위를 unlock
         fcntl.lockf(f, fcntl.LOCK_UN, page, 1)
         f.close()
-    print(rank)
-    return float(rank)
+    print('get', rank)
+    return rank
 
 
-def put_dynamodb_items(page, iter, rank, relation_length):
-    rank_table.put_item(
-        Item={
-            'iter': iter,
-            'page': str(page),
-            'rank': decimal.Decimal(str(rank)),
-            'relation_length': decimal.Decimal(str(relation_length))
-        }
-    )
+def put_efs(page, rank):
+    page = int(page)
+    with open(rank_path, 'r+b', 0) as f:
+        # file lock : start_byte 부터 10개의 byte 범위를 lock
+        fcntl.lockf(f, fcntl.LOCK_EX, 10, page, 1)
+        for idx in range(10):
+            f.seek(page * (idx + 1))
+            f.write(rank[idx].encode())
+        # file lock : start_byte 부터 10개의 byte 범위를 unlock
+        fcntl.lockf(f, fcntl.LOCK_UN, page, 1)
+        f.close()
+    print('put', rank)
+    return rank
 
 
 dampen_factor = 0.8
@@ -86,10 +90,10 @@ def ranking(page_relation):
     for page in page_relation:
         # dynamodb에 올려져 있는 해당 페이지의 rank를 가져옵니다.
         get_start = time.time()
-        past_info = get_past_pagerank(page)
+        past_rank = get_past_pagerank(page)
         get_time += time.time() - get_start
         # rank += float(past_info['rank']) / float(past_info['relation_length'])
-        rank += float(past_info)
+        rank += float(past_rank)
     rank *= dampen_factor
     return rank, get_time
 
@@ -101,9 +105,10 @@ def ranking_each_page(page, page_relation, iter, remain_page):
     page_rank = rank + remain_page
     rank_time = time.time() - rank_start
     put_start = time.time()
-    put_dynamodb_items(page, iter, page_rank, len(page_relation))
+    put_efs(page, page_rank)
     put_time = time.time() - put_start
-    return {'iter': iter, 'page': page, 'get_time': get_time, 'rank_time': rank_time, 'put_time': put_time}
+    return {'iter': iter, 'page': page, 'get_time': get_time, 'rank_time': rank_time, 'put_time': put_time,
+            'page_rank': page_rank}
 
 
 def lambda_handler(event, context):
@@ -120,5 +125,5 @@ def lambda_handler(event, context):
         if current_iter < end_iter:
             invoke_lambda(current_iter + 1, end_iter, remain_page, file)
     except:
-        pass
+        return True
     return True
