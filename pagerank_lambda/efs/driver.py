@@ -113,13 +113,22 @@ def init_iter(page):
 
 init_return = []
 for page in total_pages:
-    init_t = Thread(target=init_iter,
-                    args=(page,))
-    print(page, '번째 페이지 init 시작')
-    init_t.start()
-    init_return.append(init_t)
-for init_t in init_return:
-    init_t.join()
+    page = int(page)
+    with open(rank_path, 'r+b', 0) as f:
+        # file lock : start_byte 부터 10개의 byte 범위를 lock
+        fcntl.lockf(f, fcntl.LOCK_EX, 10, page, 1)
+        f.seek(page * 10)
+        f.write(pagerank_init)
+        # file lock : start_byte 부터 10개의 byte 범위를 unlock
+        fcntl.lockf(f, fcntl.LOCK_UN, page, 1)
+        f.close()
+    # init_t = Thread(target=init_iter,
+    #                 args=(page,))
+    # print(page, '번째 페이지 init 시작')
+    # init_t.start()
+    # init_return.append(init_t)
+# for init_t in init_return:
+#     init_t.join()
 
 print('init 끝')
 # 모든 page의 초기 Rank값은 1/(전체 페이지 수) 의 값을 가집니다.
