@@ -5,6 +5,7 @@ import time
 import decimal
 from botocore.client import Config
 from threading import Thread
+import fcntl
 
 # S3 session 생성
 s3 = boto3.resource('s3')
@@ -19,6 +20,7 @@ lambda_config = Config(read_timeout=lambda_read_timeout, max_pool_connections=bo
 lambda_client = boto3.client('lambda', config=lambda_config)
 lambda_name = 'pagerank'
 bucket = "jg-pagerank-bucket"
+rank_path = '/mnt/efs/' + 'rank_file'
 
 
 # 주어진 bucket 위치 경로에 파일 이름이 key인 object와 data를 저장합니다.
@@ -49,8 +51,18 @@ def invoke_lambda(current_iter, end_iter, remain_page, file):
 
 
 def get_past_pagerank(t, page):
-    past_pagerank = t.get_item(Key={'page': str(page)})
-    return past_pagerank['Item']
+    page = int(page)
+    rank = ''
+    with open(rank_path, 'r+b', 0) as f:
+        # file lock : start_byte 부터 10개의 byte 범위를 lock
+        fcntl.lockf(f, fcntl.LOCK_EX, 10, page, 1)
+        for idx in range(10):
+            rank += f.read(page * (idx + 1))
+        # file lock : start_byte 부터 10개의 byte 범위를 unlock
+        fcntl.lockf(f, fcntl.LOCK_UN, page, 1)
+        f.close()
+    print(rank)
+    return float(rank)
 
 
 def put_dynamodb_items(page, iter, rank, relation_length):
