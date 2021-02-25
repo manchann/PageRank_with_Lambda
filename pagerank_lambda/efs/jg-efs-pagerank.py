@@ -125,5 +125,6 @@ def lambda_handler(event, context):
         if current_iter < end_iter:
             invoke_lambda(current_iter + 1, end_iter, remain_page, file)
     except:
+        print('error')
         return True
     return True
