@@ -100,7 +100,7 @@ rank_path = '/mnt/efs/ap/' + 'rank_file'
 init_return = []
 test = 0
 for page in total_pages:
-    page = int(page)
+    page = int(page) * 10
     pagerank_init = str(pagerank_init)
     with open(rank_path, 'r+b', 0) as f:
         # file lock : start_byte 부터 10개의 byte 범위를 lock

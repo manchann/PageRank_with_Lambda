@@ -51,7 +51,7 @@ def invoke_lambda(current_iter, end_iter, remain_page, file):
 
 
 def get_past_pagerank(page):
-    page = int(page)
+    page = int(page) * 10
     rank = ''
     with open(rank_path, 'r+b', 0) as f:
         # file lock : start_byte 부터 10개의 byte 범위를 lock
@@ -66,12 +66,12 @@ def get_past_pagerank(page):
 
 
 def put_efs(page, rank):
-    page = int(page)
+    page = int(page) * 10
     with open(rank_path, 'r+b', 0) as f:
         # file lock : start_byte 부터 10개의 byte 범위를 lock
         fcntl.lockf(f, fcntl.LOCK_EX, 10, page, 1)
         for idx in range(10):
-            f.seek(page * (idx + 1))
+            f.seek(page * idx)
             f.write(rank[idx].encode())
         # file lock : start_byte 부터 10개의 byte 범위를 unlock
         fcntl.lockf(f, fcntl.LOCK_UN, page, 1)
