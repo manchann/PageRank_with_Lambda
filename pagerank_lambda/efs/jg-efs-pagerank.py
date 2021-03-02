@@ -57,7 +57,7 @@ def get_past_pagerank(page):
         # file lock : start_byte 부터 10개의 byte 범위를 lock
         fcntl.lockf(f, fcntl.LOCK_EX, 10, page, 1)
         for idx in range(10):
-            rank += f.read(page * (idx + 1)).decode()
+            rank += f.read(page + idx).decode()
         # file lock : start_byte 부터 10개의 byte 범위를 unlock
         fcntl.lockf(f, fcntl.LOCK_UN, page, 1)
         f.close()
@@ -71,7 +71,7 @@ def put_efs(page, rank):
         # file lock : start_byte 부터 10개의 byte 범위를 lock
         fcntl.lockf(f, fcntl.LOCK_EX, 10, page, 1)
         for idx in range(10):
-            f.seek(page * idx)
+            f.seek(page + idx)
             f.write(rank[idx].encode())
         # file lock : start_byte 부터 10개의 byte 범위를 unlock
         fcntl.lockf(f, fcntl.LOCK_UN, page, 1)
