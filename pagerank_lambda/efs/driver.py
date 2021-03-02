@@ -98,7 +98,6 @@ pagerank_init = 1 / total_page_length
 rank_path = '/mnt/efs/ap/' + 'rank_file'
 
 init_return = []
-test = 0
 for page in total_pages:
     page = int(page) * 10
     pagerank_init = str(pagerank_init)
@@ -113,9 +112,6 @@ for page in total_pages:
         # file lock : start_byte 부터 10개의 byte 범위를 unlock
         fcntl.lockf(f, fcntl.LOCK_UN, page, 1)
         f.close()
-    test += 1
-    if test == 3:
-        break
     # init_t = Thread(target=init_iter,
     #                 args=(page,))
     # print(page, '번째 페이지 init 시작')
