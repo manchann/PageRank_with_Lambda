@@ -52,14 +52,14 @@ def invoke_lambda(current_iter, end_iter, remain_page, file):
 
 def get_past_pagerank(page):
     page = int(page) * 10
-    rank = ''
+    rank = ""
     with open(rank_path, 'r+b', 0) as f:
         # file lock : start_byte 부터 10개의 byte 범위를 lock
-        fcntl.lockf(f, fcntl.LOCK_EX, 10, page, 1)
         for idx in range(10):
-            rank += f.read(page + idx).decode()
+            f.seek(page + idx)
+            rank += f.read(1).decode()
+            print('type', type(rank))
         # file lock : start_byte 부터 10개의 byte 범위를 unlock
-        fcntl.lockf(f, fcntl.LOCK_UN, page, 1)
         f.close()
     print('get', rank)
     return rank
@@ -90,7 +90,7 @@ def ranking(page_relation):
     for page in page_relation:
         # dynamodb에 올려져 있는 해당 페이지의 rank를 가져옵니다.
         get_start = time.time()
-        past_rank = get_past_pagerank(page)
+        past_rank = float(get_past_pagerank(page))
         get_time += time.time() - get_start
         # rank += float(past_info['rank']) / float(past_info['relation_length'])
         rank += float(past_rank)
