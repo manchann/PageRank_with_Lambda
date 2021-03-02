@@ -97,23 +97,6 @@ total_page_length = len(total_pages)
 pagerank_init = 1 / total_page_length
 rank_path = '/mnt/efs/ap/' + 'rank_file'
 
-
-# DynamoDB에 모든 페이지의 초기값들을 업로드 합니다.
-def init_iter(page):
-    page = int(page)
-    with open(rank_path, 'r+b', 0) as f:
-        # file lock : start_byte 부터 10개의 byte 범위를 lock
-        fcntl.lockf(f, fcntl.LOCK_EX, 10, page, 1)
-        f.seek(page * 10)
-        for idx in range(10):
-            f.seek(page * (idx + 1))
-            print('idx', pagerank_init[idx].encode())
-            f.write(pagerank_init[idx].encode())
-        # file lock : start_byte 부터 10개의 byte 범위를 unlock
-        fcntl.lockf(f, fcntl.LOCK_UN, page, 1)
-        f.close()
-
-
 init_return = []
 test = 0
 for page in total_pages:
@@ -124,6 +107,7 @@ for page in total_pages:
         fcntl.lockf(f, fcntl.LOCK_EX, 10, page, 1)
         for idx in range(10):
             f.seek(page * (idx + 1))
+            print('idx', pagerank_init[idx].encode())
             f.write(pagerank_init[idx].encode())
         print(page)
         # file lock : start_byte 부터 10개의 byte 범위를 unlock
