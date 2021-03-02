@@ -106,7 +106,7 @@ for page in total_pages:
         # file lock : start_byte 부터 10개의 byte 범위를 lock
         fcntl.lockf(f, fcntl.LOCK_EX, 10, page, 1)
         for idx in range(10):
-            f.seek(page * (idx + 1))
+            f.seek(page * idx)
             print('idx', pagerank_init[idx].encode())
             f.write(pagerank_init[idx].encode())
         print(page)
