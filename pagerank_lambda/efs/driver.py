@@ -95,7 +95,7 @@ total_pages = get_s3_object(bucket, config['relationPrefix'] + 'total_page.txt')
 
 total_page_length = len(total_pages)
 pagerank_init = 1 / total_page_length
-rank_path = '/mnt/efs/ap' + 'rank_file'
+rank_path = '/mnt/efs/ap/' + 'rank_file'
 
 
 # DynamoDB에 모든 페이지의 초기값들을 업로드 합니다.
