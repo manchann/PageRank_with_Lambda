@@ -125,7 +125,7 @@ def lambda_handler(event, context):
         # current_iter = end_iter이 되기 전 까지 다음 iteration 람다를 invoke합니다.
         if current_iter < end_iter:
             invoke_lambda(current_iter + 1, end_iter, remain_page, file)
-    except:
-        print('error')
+    except Exception as e:
+        print('error', e)
         return True
     return True
