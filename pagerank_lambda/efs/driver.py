@@ -107,6 +107,7 @@ def init_iter(page):
         f.seek(page * 10)
         for idx in range(10):
             f.seek(page * (idx + 1))
+            print('idx', pagerank_init[idx].encode())
             f.write(pagerank_init[idx].encode())
         # file lock : start_byte 부터 10개의 byte 범위를 unlock
         fcntl.lockf(f, fcntl.LOCK_UN, page, 1)
@@ -114,7 +115,7 @@ def init_iter(page):
 
 
 init_return = []
-test =0
+test = 0
 for page in total_pages:
     page = int(page)
     pagerank_init = str(pagerank_init)
@@ -128,7 +129,7 @@ for page in total_pages:
         # file lock : start_byte 부터 10개의 byte 범위를 unlock
         fcntl.lockf(f, fcntl.LOCK_UN, page, 1)
         f.close()
-    test +=1
+    test += 1
     if test == 3:
         break
     # init_t = Thread(target=init_iter,
