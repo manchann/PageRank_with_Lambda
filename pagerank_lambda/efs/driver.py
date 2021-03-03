@@ -96,6 +96,7 @@ total_pages = get_s3_object(bucket, config['relationPrefix'] + 'total_page.txt')
 total_page_length = len(total_pages)
 pagerank_init = 1 / total_page_length
 rank_path = '/mnt/efs/ap/' + 'rank_file'
+relation_path = '/mnt/efs/ap' + 'relation'
 
 init_return = []
 for page in total_pages:
@@ -108,6 +109,17 @@ for page in total_pages:
             f.seek(page + idx)
             f.write(pagerank_init[idx].encode())
         print(page)
+        # file lock : start_byte 부터 10개의 byte 범위를 unlock
+        fcntl.lockf(f, fcntl.LOCK_UN, page, 1)
+        f.close()
+
+    page_relation = page_relations[page]
+    with open(relation_path, 'r+b', 0) as f:
+        # file lock : start_byte 부터 10개의 byte 범위를 lock
+        fcntl.lockf(f, fcntl.LOCK_EX, 10, page, 1)
+        for idx in range(len(page_relation)):
+            f.seek(page + idx)
+            f.write(page_relation[idx].encode())
         # file lock : start_byte 부터 10개의 byte 범위를 unlock
         fcntl.lockf(f, fcntl.LOCK_UN, page, 1)
         f.close()

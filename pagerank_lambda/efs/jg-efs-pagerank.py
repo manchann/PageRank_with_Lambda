@@ -21,6 +21,7 @@ lambda_client = boto3.client('lambda', config=lambda_config)
 lambda_name = 'pagerank'
 bucket = "jg-pagerank-bucket2"
 rank_path = '/mnt/efs/' + 'rank_file'
+relation_path = '/mnt/efs/' + 'relation'
 
 
 # 주어진 bucket 위치 경로에 파일 이름이 key인 object와 data를 저장합니다.
@@ -54,19 +55,25 @@ def get_past_pagerank(page):
     page = int(page) * 10
     rank = ""
     with open(rank_path, 'r+b', 0) as f:
-        # file lock : start_byte 부터 10개의 byte 범위를 lock
         for idx in range(10):
             f.seek(page + idx)
             rank += f.read(1).decode()
-            print('type', type(rank))
-        # file lock : start_byte 부터 10개의 byte 범위를 unlock
         f.close()
-    print('get', rank)
-    return rank
+
+    relation = ""
+    with open(relation_path, 'r+b', 0) as f:
+        for idx in range(10):
+            f.seek(page + idx)
+            if f.read(1).decode() == "":
+                break
+            rank += f.read(1).decode()
+        f.close()
+    return float(rank), float(relation)
 
 
 def put_efs(page, rank):
     page = int(page) * 10
+    rank = str(rank)
     with open(rank_path, 'r+b', 0) as f:
         # file lock : start_byte 부터 10개의 byte 범위를 lock
         fcntl.lockf(f, fcntl.LOCK_EX, 10, page, 1)
@@ -76,7 +83,6 @@ def put_efs(page, rank):
         # file lock : start_byte 부터 10개의 byte 범위를 unlock
         fcntl.lockf(f, fcntl.LOCK_UN, page, 1)
         f.close()
-    print('put', rank)
     return rank
 
 
@@ -90,10 +96,9 @@ def ranking(page_relation):
     for page in page_relation:
         # dynamodb에 올려져 있는 해당 페이지의 rank를 가져옵니다.
         get_start = time.time()
-        past_rank = float(get_past_pagerank(page))
+        past_rank, relation = get_past_pagerank(page)
         get_time += time.time() - get_start
-        # rank += float(past_info['rank']) / float(past_info['relation_length'])
-        rank += float(past_rank)
+        rank += past_rank / relation
     rank *= dampen_factor
     return rank, get_time
 
@@ -126,6 +131,5 @@ def lambda_handler(event, context):
         if current_iter < end_iter:
             invoke_lambda(current_iter + 1, end_iter, remain_page, file)
     except Exception as e:
-        print('error', e)
         return True
     return True
