@@ -113,7 +113,7 @@ for page in total_pages:
         fcntl.lockf(f, fcntl.LOCK_UN, distance, 1)
         f.close()
 
-    page_relation = page_relations[page]
+    page_relation = page_relations[int(page)]
     with open(relation_path, 'r+b', 0) as f:
         # file lock : start_byte 부터 10개의 byte 범위를 lock
         fcntl.lockf(f, fcntl.LOCK_EX, 10, distance, 1)
