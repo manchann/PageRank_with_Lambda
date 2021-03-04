@@ -49,6 +49,7 @@ def invoke_lambda(current_iter, end_iter, remain_page, file):
             "file": file,
         })
     )
+    return True
 
 
 def get_past_pagerank(page):
@@ -57,6 +58,8 @@ def get_past_pagerank(page):
     with open(rank_path, 'r+b', 0) as f:
         for idx in range(10):
             f.seek(page + idx)
+            if f.read(1).decode() == "":
+                break
             rank += f.read(1).decode()
         f.close()
 
@@ -66,9 +69,10 @@ def get_past_pagerank(page):
             f.seek(page + idx)
             if f.read(1).decode() == "":
                 break
-            rank += f.read(1).decode()
+            relation += f.read(1).decode()
         f.close()
-    return float(rank), float(relation)
+    print(relation)
+    return float(rank), relation
 
 
 def put_efs(page, rank):
@@ -98,7 +102,7 @@ def ranking(page_relation):
         get_start = time.time()
         past_rank, relation = get_past_pagerank(page)
         get_time += time.time() - get_start
-        rank += past_rank / relation
+        rank += past_rank
     rank *= dampen_factor
     return rank, get_time
 
@@ -128,6 +132,8 @@ def lambda_handler(event, context):
             print(ranking_result)
         # current_iter = end_iter이 되기 전 까지 다음 iteration 람다를 invoke합니다.
         if current_iter < end_iter:
+            print(file)
+            print(current_iter)
             invoke_lambda(current_iter + 1, end_iter, remain_page, file)
     except Exception as e:
         print('error', e)

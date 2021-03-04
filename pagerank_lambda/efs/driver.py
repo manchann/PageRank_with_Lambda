@@ -62,7 +62,7 @@ def invoke_lambda(current_iter, end_iter, remain_page, file, pagerank_init):
             "pagerank_init": pagerank_init
         })
     )
-
+    return True
 
 def get_s3_object(bucket, key):
     response = s3_client.get_object(Bucket=bucket, Key=key)
