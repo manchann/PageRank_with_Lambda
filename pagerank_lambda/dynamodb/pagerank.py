@@ -38,7 +38,7 @@ def invoke_lambda(current_iter, end_iter, remain_page, file):
 
     resp = lambda_client.invoke(
         FunctionName=lambda_name,
-        InvocationType='RequestResponse',
+        InvocationType='Event',
         Payload=json.dumps({
             "current_iter": current_iter,
             "end_iter": end_iter,
