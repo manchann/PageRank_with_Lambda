@@ -114,6 +114,7 @@ for page in total_pages:
         f.close()
     try:
         relation_length = str(len(page_relations[page]))
+        print(page_relations[page])
     except:
         relation_length = str(1)
     with open(relation_path, 'r+b', 0) as f:
