@@ -117,7 +117,6 @@ def ranking_each_page(page, page_relation, iter, remain_page):
 
 
 def lambda_handler(event, context):
-    print(event)
     current_iter = event['current_iter']
     end_iter = event['end_iter']
     remain_page = event['remain_page']
@@ -131,5 +130,6 @@ def lambda_handler(event, context):
         if current_iter < end_iter:
             invoke_lambda(current_iter + 1, end_iter, remain_page, file)
     except Exception as e:
+        print('error', e)
         return True
     return True
