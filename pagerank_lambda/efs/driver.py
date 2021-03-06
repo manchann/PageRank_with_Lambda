@@ -64,6 +64,7 @@ def invoke_lambda(current_iter, end_iter, remain_page, file, pagerank_init):
     )
     return True
 
+
 def get_s3_object(bucket, key):
     response = s3_client.get_object(Bucket=bucket, Key=key)
     return json.loads(response['Body'].read().decode())
@@ -140,7 +141,7 @@ print('init 끝')
 # 앞서 zip으로 만든 파일이 Lambda에 업로드 되었으므로 로컬에서의 zip파일을 삭제합니다.
 # removeZip(lambda_zip)
 # 반복 횟수를 설정합니다.
-end_iter = 10
+end_iter = 2
 dampen_factor = 0.8
 remain_page = (1 - dampen_factor) / total_page_length
 
