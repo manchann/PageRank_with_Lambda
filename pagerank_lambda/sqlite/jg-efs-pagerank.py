@@ -49,7 +49,6 @@ def invoke_lambda(current_iter, end_iter, remain_page, file):
             "file": file,
         })
     )
-    print('invoke 완료', current_iter)
     return True
 
 
