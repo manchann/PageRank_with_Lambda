@@ -58,17 +58,18 @@ def get_past_pagerank(page):
     rank = ""
     with open(rank_path, 'r+b', 0) as f:
         for idx in range(10):
-            f.seek(page + idx)
+            f.seek(page + idx - 1)
             if f.read(1).decode() == "":
                 break
             rank += f.read(1).decode()
+            print(idx, ' ', rank)
         f.close()
 
     relation = ""
     with open(relation_path, 'r+b', 0) as f:
         for idx in range(10):
             f.seek(page + idx)
-            if f.read(1).decode() == "":
+            if f.read(1).decode() == b"":
                 break
             relation += f.read(1).decode()
         f.close()
