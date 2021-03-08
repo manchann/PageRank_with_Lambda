@@ -102,24 +102,13 @@ db_path = '/mnt/efs/ap/' + db_name
 conn = sqlite3.connect(db_path)
 init_return = []
 for page in total_pages:
-    try:
-        cur = conn.cursor()
-        cur.execute('INSERT INTO pagerank VALUES (?,?,?,?)',
-                    (page, 0, pagerank_init, len(page_relations[page])))
-        print('sqlite', cur.fetchone())
-        conn.commit()
-    except Exception as e:
-        print(e)
-        pass
-
-    # init_t = Thread(target=init_iter,
-    #                 args=(page,))
-    # print(page, '번째 페이지 init 시작')
-    # init_t.start()
-    # init_return.append(init_t)
-# for init_t in init_return:
-#     init_t.join()
-
+    relation_length = page_relations[page] if page_relations[page] else 1
+    cur = conn.cursor()
+    cur.execute('INSERT INTO pagerank VALUES (?,?,?,?)',
+                (page, 0, pagerank_init, len(page_relations[page])))
+    cur.execute('SELECT * FROM pagerank WHERE page=?', page)
+    print(cur.fetchone())
+    conn.commit()
 
 print('init 끝')
 # 모든 page의 초기 Rank값은 1/(전체 페이지 수) 의 값을 가집니다.
