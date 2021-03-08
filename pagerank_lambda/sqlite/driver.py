@@ -109,7 +109,8 @@ for page in total_pages:
         print('sqlite', cur.fetchone())
         conn.commit()
         conn.close()
-    except:
+    except Exception as e:
+        print(e)
         pass
     # init_t = Thread(target=init_iter,
     #                 args=(page,))
