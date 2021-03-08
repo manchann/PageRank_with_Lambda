@@ -102,12 +102,15 @@ db_path = '/mnt/efs/ap/' + db_name
 conn = sqlite3.connect(db_path)
 init_return = []
 for page in total_pages:
-    cur = conn.cursor()
-    cur.execute('INSERT INTO pagerank VALUES (?,?,?,?)',
-                (page, 0, pagerank_init, len(page_relations[page])))
-    print('sqlite', cur.fetchone())
-    conn.commit()
-    conn.close()
+    try:
+        cur = conn.cursor()
+        cur.execute('INSERT INTO pagerank VALUES (?,?,?,?)',
+                    (page, 0, pagerank_init, len(page_relations[page])))
+        print('sqlite', cur.fetchone())
+        conn.commit()
+        conn.close()
+    except:
+        pass
     # init_t = Thread(target=init_iter,
     #                 args=(page,))
     # print(page, '번째 페이지 init 시작')
