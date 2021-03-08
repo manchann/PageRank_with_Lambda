@@ -104,6 +104,9 @@ for page in total_pages:
     cur = conn.cursor()
     cur.execute('INSERT INTO pagerank VALUES (?,?,?,?)',
                 (page, 0, pagerank_init, len(page_relations[page])))
+    print(cur.fetchone())
+    conn.commit()
+    conn.close()
     # init_t = Thread(target=init_iter,
     #                 args=(page,))
     # print(page, '번째 페이지 init 시작')
