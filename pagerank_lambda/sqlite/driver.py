@@ -10,6 +10,7 @@ from botocore.client import Config
 from boto3.dynamodb.types import DYNAMODB_CONTEXT
 from threading import Thread
 import fcntl
+import sqlite3
 
 os.system('export serverless_mapreduce_role=arn:aws:iam::741926482963:role/biglambda_role')
 
@@ -96,37 +97,15 @@ total_pages = get_s3_object(bucket, config['relationPrefix'] + 'total_page.txt')
 
 total_page_length = len(total_pages)
 pagerank_init = 1 / total_page_length
-rank_path = '/mnt/efs/ap/' + 'rank_file'
-relation_path = '/mnt/efs/ap/' + 'relation'
+db_name = 'pagerank.db'
+db_path = '/mnt/efs/ap/' + db_name
 
+conn = sqlite3.connect(db_path)
 init_return = []
 for page in total_pages:
-    distance = int(page) * 10
-    pagerank_init = str(pagerank_init)
-    with open(rank_path, 'r+b', 0) as f:
-        # file lock : start_byte 부터 10개의 byte 범위를 lock
-        fcntl.lockf(f, fcntl.LOCK_EX, 10, distance, 1)
-        for idx in range(10):
-            f.seek(distance + idx)
-            f.write(pagerank_init[idx].encode())
-        print(page)
-        # file lock : start_byte 부터 10개의 byte 범위를 unlock
-        fcntl.lockf(f, fcntl.LOCK_UN, distance, 1)
-        f.close()
-    try:
-        relation_length = str(len(page_relations[page]))
-        print(page_relations[page])
-    except:
-        relation_length = str(1)
-    with open(relation_path, 'r+b', 0) as f:
-        # file lock : start_byte 부터 10개의 byte 범위를 lock
-        fcntl.lockf(f, fcntl.LOCK_EX, 10, distance, 1)
-        for idx in range(len(relation_length)):
-            f.seek(distance + idx)
-            f.write(relation_length[idx].encode())
-        # file lock : start_byte 부터 10개의 byte 범위를 unlock
-        fcntl.lockf(f, fcntl.LOCK_UN, distance, 1)
-        f.close()
+    cur = conn.cursor()
+    cur.execute('INSERT INTO pagerank VALUES (?,?,?,?)',
+                (page, 0, pagerank_init, len(page_relations[page])))
     # init_t = Thread(target=init_iter,
     #                 args=(page,))
     # print(page, '번째 페이지 init 시작')
@@ -159,11 +138,11 @@ print('pages 분할 개수:', divided_page_num)
 #     t_return.append(t)
 # for t in t_return:
 #     t.join()
-
-for idx in range(invoked_lambda_num + 1):
-    try:
-        s3_file_path = config['relationPrefix'] + str(idx) + '.txt'
-        print(idx, '번째 invoking')
-        invoke_lambda(1, end_iter, remain_page, s3_file_path, pagerank_init)
-    except:
-        pass
+#
+# for idx in range(invoked_lambda_num + 1):
+#     try:
+#         s3_file_path = config['relationPrefix'] + str(idx) + '.txt'
+#         print(idx, '번째 invoking')
+#         invoke_lambda(1, end_iter, remain_page, s3_file_path, pagerank_init)
+#     except:
+#         pass

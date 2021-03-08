@@ -64,15 +64,6 @@ def get_past_pagerank(page):
         f.close()
 
     relation = ""
-    with open(relation_path, 'r+b', 0) as f:
-        for idx in range(10):
-            f.seek(page + idx)
-            if f.read(1).decode() == "":
-                break
-            relation += f.read(1).decode()
-        f.close()
-    print(relation)
-    return float(rank), relation
 
 
 def put_efs(page, rank):
