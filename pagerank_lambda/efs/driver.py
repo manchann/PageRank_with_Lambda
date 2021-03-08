@@ -81,17 +81,16 @@ def get_page_relation(file):
 # l_pagerank.update_code_or_create_on_noexist()
 
 # page의 관계들이 담겨있는 파일을 가지고 dictionary 관계 데이터셋을 만듭니다.
-# page_relations = {}
+page_relations = {}
 divided_page_num = config["divided_page_num"]
 invoked_lambda_num = config["invoked_lambda_num"]
 
 # 전체 페이지의 개수를 계산합니다.
-# for i in range(invoked_lambda_num + 1):
-#     try:
-#         page_relations.update(get_s3_object(bucket, config['relationPrefix'] + str(i) + '.txt'))
-#     except:
-#         pass
-page_relations = []
+for i in range(invoked_lambda_num + 1):
+    try:
+        page_relations.update(get_s3_object(bucket, config['relationPrefix'] + str(i) + '.txt'))
+    except:
+        pass
 total_pages = get_s3_object(bucket, config['relationPrefix'] + 'total_page.txt')
 
 total_page_length = len(total_pages)
