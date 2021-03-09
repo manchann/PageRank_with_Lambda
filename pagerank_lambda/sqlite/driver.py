@@ -108,7 +108,7 @@ for page in total_pages:
         page_relation = ['-1']
     cur = conn.cursor()
     cur.execute('INSERT OR REPLACE INTO pagerank VALUES (?,?,?,?)',
-                (page, 0, pagerank_init, page_relation))
+                (page, 0, pagerank_init, len(page_relation)))
     print(cur.fetchone())
     conn.commit()
 
