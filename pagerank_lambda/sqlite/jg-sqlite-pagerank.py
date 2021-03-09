@@ -59,7 +59,7 @@ def invoke_lambda(current_iter, end_iter, remain_page, file):
 def get_past_pagerank(page, iter):
     conn = sqlite3.connect(db_path)
     cur = conn.cursor()
-    cur.execute('SELECT * FROM pagerank WHERE page=? AND iter>=?', (int(page), int(iter) - 1))
+    cur.execute('SELECT * FROM pagerank WHERE page=?', page)
     ret = cur.fetchall()
     print(ret[0])
     print(ret[0][2])
@@ -70,7 +70,7 @@ def put_efs(page, rank, iter, relation_length):
     conn = sqlite3.connect(db_path + db_name)
 
     cur = conn.cursor()
-    cur.execute('INSERT INTO pagerank VALUES (?, ?, ?)',
+    cur.execute('INSERT OR REPLACE INTO pagerank VALUES (?, ?, ?, ?)',
                 (page, rank, iter, relation_length))
     cur.execute('SELECT * FROM pagerank')
     print(cur.fetchall())
