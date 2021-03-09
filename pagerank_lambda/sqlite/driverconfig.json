@@ -12,8 +12,8 @@
   "divided_page_num": 1000,
   "invoked_lambda_num": 4840,
   "lambda": {
-    "name": "jg-efs-pagerank",
-    "handler": "jg-efs-pagerank.lambda_handler",
-    "zip": "jg-efs-pagerank.zip"
+    "name": "jg-sqlite-pagerank",
+    "handler": "jg-sqlite-pagerank.lambda_handler",
+    "zip": "jg-sqlite-pagerank.zip"
   }
 }

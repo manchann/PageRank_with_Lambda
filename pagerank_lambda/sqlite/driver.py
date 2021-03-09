@@ -104,7 +104,7 @@ init_return = []
 for page in total_pages:
     relation_length = page_relations[page] if page_relations[page] else 1
     cur = conn.cursor()
-    cur.execute('INSERT INTO pagerank VALUES (?,?,?,?)',
+    cur.execute('INSERT OR REPLACE INTO pagerank VALUES (?,?,?,?)',
                 (page, 0, pagerank_init, len(page_relations[page])))
     cur.execute('SELECT * FROM pagerank WHERE page=?', page)
     print(cur.fetchone())

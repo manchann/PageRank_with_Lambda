@@ -6,6 +6,7 @@ import decimal
 from botocore.client import Config
 from threading import Thread
 import fcntl
+import sqlite3
 
 # S3 session 생성
 s3 = boto3.resource('s3')
@@ -22,6 +23,9 @@ lambda_name = 'pagerank'
 bucket = "jg-pagerank-bucket2"
 rank_path = '/mnt/efs/' + 'rank_file'
 relation_path = '/mnt/efs/' + 'relation'
+
+db_name = 'pagerank.db'
+db_path = '/mnt/efs/' + db_name
 
 
 # 주어진 bucket 위치 경로에 파일 이름이 key인 object와 data를 저장합니다.
@@ -52,32 +56,25 @@ def invoke_lambda(current_iter, end_iter, remain_page, file):
     return True
 
 
-def get_past_pagerank(page):
-    page = int(page) * 10
-    rank = ""
-    with open(rank_path, 'r+b', 0) as f:
-        for idx in range(10):
-            f.seek(page + idx)
-            if f.read(1).decode() == "":
-                break
-            rank += f.read(1).decode()
-        f.close()
-
-    relation = ""
+def get_past_pagerank(page, iter):
+    conn = sqlite3.connect(db_path)
+    cur = conn.cursor()
+    cur.execute('SELECT * FROM pagerank WHERE page=? AND iter>=?', (int(page), int(iter) - 1))
+    ret = cur.fetchall()
+    print(ret[0])
+    print(ret[0][2])
+    return ret[0][2], ret[0][3]
 
 
-def put_efs(page, rank):
-    page = int(page) * 10
-    rank = str(rank)
-    with open(rank_path, 'r+b', 0) as f:
-        # file lock : start_byte 부터 10개의 byte 범위를 lock
-        fcntl.lockf(f, fcntl.LOCK_EX, 10, page, 1)
-        for idx in range(10):
-            f.seek(page + idx)
-            f.write(rank[idx].encode())
-        # file lock : start_byte 부터 10개의 byte 범위를 unlock
-        fcntl.lockf(f, fcntl.LOCK_UN, page, 1)
-        f.close()
+def put_efs(page, rank, iter, relation_length):
+    conn = sqlite3.connect(db_path + db_name)
+
+    cur = conn.cursor()
+    cur.execute('INSERT INTO pagerank VALUES (?, ?, ?)',
+                (page, rank, iter, relation_length))
+    cur.execute('SELECT * FROM pagerank')
+    print(cur.fetchall())
+    conn.commit()
     return rank
 
 
@@ -85,15 +82,15 @@ dampen_factor = 0.8
 
 
 # 랭크를 계산합니다.
-def ranking(page_relation):
+def ranking(page_relation, iter):
     rank = 0
     get_time = 0
     for page in page_relation:
         # dynamodb에 올려져 있는 해당 페이지의 rank를 가져옵니다.
         get_start = time.time()
-        past_rank, relation = get_past_pagerank(page)
+        past_rank, relation_length = get_past_pagerank(page, iter)
         get_time += time.time() - get_start
-        rank += past_rank
+        rank += (past_rank / relation_length)
     rank *= dampen_factor
     return rank, get_time
 
@@ -101,13 +98,17 @@ def ranking(page_relation):
 # 각각 페이지에 대하여 rank를 계산하고 dynamodb에 업데이트 합니다.
 def ranking_each_page(page, page_relation, iter, remain_page):
     rank_start = time.time()
-    rank, get_time = ranking(page_relation)
+    rank, get_time = ranking(page_relation, iter)
     page_rank = rank + remain_page
     rank_time = time.time() - rank_start
     put_start = time.time()
-    put_efs(page, page_rank)
+    put_efs(page, page_rank, iter, len(page_relation))
     put_time = time.time() - put_start
-    return {'iter': iter, 'page': page, 'get_time': get_time, 'rank_time': rank_time, 'put_time': put_time,
+    return {'iter': iter,
+            'page': page,
+            'get_time': get_time,
+            'rank_time': rank_time,
+            'put_time': put_time,
             'page_rank': page_rank}
 
 
@@ -123,8 +124,6 @@ def lambda_handler(event, context):
             print(ranking_result)
         # current_iter = end_iter이 되기 전 까지 다음 iteration 람다를 invoke합니다.
         if current_iter < end_iter:
-            print(file)
-            print(current_iter)
             invoke_lambda(current_iter + 1, end_iter, remain_page, file)
     except Exception as e:
         print('error', e)
