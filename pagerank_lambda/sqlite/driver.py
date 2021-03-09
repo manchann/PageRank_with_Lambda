@@ -103,6 +103,9 @@ conn = sqlite3.connect(db_path)
 init_return = []
 for page in total_pages:
     relation_length = page_relations[page] if page_relations[page] else 1
+    print(relation_length)
+    if page == '47':
+        print(page)
     cur = conn.cursor()
     cur.execute('INSERT OR REPLACE INTO pagerank VALUES (?,?,?,?)',
                 (page, 0, pagerank_init, len(page_relations[page])))
