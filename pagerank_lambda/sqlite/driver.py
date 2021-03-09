@@ -103,14 +103,14 @@ conn = sqlite3.connect(db_path)
 init_return = []
 for page in total_pages:
     try:
-        print(len(page_relations[page]))
+        page_relation = page_relations[page]
     except:
-        print('error', page_relations[page])
-    # cur = conn.cursor()
-    # cur.execute('INSERT OR REPLACE INTO pagerank VALUES (?,?,?,?)',
-    #             (page, 0, pagerank_init, len(page_relations[page])))
-    # print(cur.fetchone())
-    # conn.commit()
+        page_relation = ['-1']
+    cur = conn.cursor()
+    cur.execute('INSERT OR REPLACE INTO pagerank VALUES (?,?,?,?)',
+                (page, 0, pagerank_init, len(page_relations[page])))
+    print(cur.fetchone())
+    conn.commit()
 
 print('init 끝')
 # 모든 page의 초기 Rank값은 1/(전체 페이지 수) 의 값을 가집니다.
