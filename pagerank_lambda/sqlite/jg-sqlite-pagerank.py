@@ -12,8 +12,6 @@ import sqlite3
 s3 = boto3.resource('s3')
 s3_client = boto3.client('s3')
 dynamodb = boto3.resource('dynamodb')
-db_name = 'jg-pagerank'
-rank_table = dynamodb.Table(db_name)
 
 lambda_read_timeout = 300
 boto_max_connections = 1000
@@ -56,24 +54,21 @@ def invoke_lambda(current_iter, end_iter, remain_page, file):
     return True
 
 
-def get_past_pagerank(page, iter):
+def get_past_pagerank(page):
     conn = sqlite3.connect(db_path)
     cur = conn.cursor()
-    cur.execute('SELECT * FROM pagerank WHERE page=?', page)
+    cur.execute('SELECT * FROM pagerank WHERE page=?', (page,))
     ret = cur.fetchall()
     print(ret[0])
-    print(ret[0][2])
-    return ret[0][2], ret[0][3]
+    return float(ret[0][2]), int(ret[0][3])
 
 
 def put_efs(page, rank, iter, relation_length):
-    conn = sqlite3.connect(db_path + db_name)
+    conn = sqlite3.connect(db_path)
 
     cur = conn.cursor()
     cur.execute('INSERT OR REPLACE INTO pagerank VALUES (?, ?, ?, ?)',
-                (page, rank, iter, relation_length))
-    cur.execute('SELECT * FROM pagerank')
-    print(cur.fetchall())
+                (page, iter, rank, relation_length))
     conn.commit()
     return rank
 
@@ -82,13 +77,13 @@ dampen_factor = 0.8
 
 
 # 랭크를 계산합니다.
-def ranking(page_relation, iter):
+def ranking(page_relation):
     rank = 0
     get_time = 0
     for page in page_relation:
         # dynamodb에 올려져 있는 해당 페이지의 rank를 가져옵니다.
         get_start = time.time()
-        past_rank, relation_length = get_past_pagerank(page, iter)
+        past_rank, relation_length = get_past_pagerank(page)
         get_time += time.time() - get_start
         rank += (past_rank / relation_length)
     rank *= dampen_factor
@@ -98,7 +93,7 @@ def ranking(page_relation, iter):
 # 각각 페이지에 대하여 rank를 계산하고 dynamodb에 업데이트 합니다.
 def ranking_each_page(page, page_relation, iter, remain_page):
     rank_start = time.time()
-    rank, get_time = ranking(page_relation, iter)
+    rank, get_time = ranking(page_relation)
     page_rank = rank + remain_page
     rank_time = time.time() - rank_start
     put_start = time.time()
@@ -123,7 +118,7 @@ def lambda_handler(event, context):
             ranking_result = ranking_each_page(page, page_relation, current_iter, remain_page)
             print(ranking_result)
         # current_iter = end_iter이 되기 전 까지 다음 iteration 람다를 invoke합니다.
-        if current_iter < end_iter:
+        if current_iter <= end_iter:
             invoke_lambda(current_iter + 1, end_iter, remain_page, file)
     except Exception as e:
         print('error', e)
