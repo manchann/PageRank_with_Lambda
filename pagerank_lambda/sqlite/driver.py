@@ -102,8 +102,7 @@ db_path = '/mnt/efs/ap/' + db_name
 conn = sqlite3.connect(db_path)
 init_return = []
 for page in total_pages:
-    relation_length = page_relations[page] if page_relations[page] else 1
-    print(relation_length)
+    relation_length = page_relations[page] if page_relations[page] else ['-1']
     if page == '47':
         print(page)
     cur = conn.cursor()
