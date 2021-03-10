@@ -68,8 +68,6 @@ def put_efs(page, rank, iter, relation_length):
     cur.execute('INSERT OR REPLACE INTO pagerank VALUES (?, ?, ?, ?)',
                 (page, iter, rank, relation_length))
     conn.commit()
-    cur.close()
-    conn.close()
     return rank
 
 
