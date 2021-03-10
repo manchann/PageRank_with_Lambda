@@ -7,6 +7,7 @@ from botocore.client import Config
 from threading import Thread
 import fcntl
 import sqlite3
+import os
 
 # S3 session 생성
 s3 = boto3.resource('s3')
@@ -15,12 +16,11 @@ dynamodb = boto3.resource('dynamodb')
 
 lambda_read_timeout = 300
 boto_max_connections = 1000
-lambda_config = Config(read_timeout=lambda_read_timeout, max_pool_connections=boto_max_connections)
-lambda_client = boto3.client('lambda', config=lambda_config)
-lambda_name = 'pagerank'
+lambda_config = Config(read_timeout=lambda_read_timeout, max_pool_connections=boto_max_connections,
+                       retries={'max_attempts': 0})
+lambda_client = boto3.client('lambda', region_name='us-west-2', config=lambda_config)
+lambda_name = 'jg-sqlite-pagerank'
 bucket = "jg-pagerank-bucket2"
-rank_path = '/mnt/efs/' + 'rank_file'
-relation_path = '/mnt/efs/' + 'relation'
 
 db_name = 'pagerank.db'
 db_path = '/mnt/efs/' + db_name
@@ -54,22 +54,22 @@ def invoke_lambda(current_iter, end_iter, remain_page, file):
     return True
 
 
-def get_past_pagerank(page):
-    conn = sqlite3.connect(db_path)
-    cur = conn.cursor()
-    cur.execute('SELECT * FROM pagerank WHERE page=?', (page,))
+conn = sqlite3.connect(db_path)
+cur = conn.cursor()
+
+
+def get_past_pagerank(query):
+    cur.execute(query)
     ret = cur.fetchall()
-    print(ret[0])
-    return float(ret[0][2]), int(ret[0][3])
+    return ret
 
 
 def put_efs(page, rank, iter, relation_length):
-    conn = sqlite3.connect(db_path)
-
-    cur = conn.cursor()
     cur.execute('INSERT OR REPLACE INTO pagerank VALUES (?, ?, ?, ?)',
                 (page, iter, rank, relation_length))
     conn.commit()
+    cur.close()
+    conn.close()
     return rank
 
 
@@ -80,11 +80,17 @@ dampen_factor = 0.8
 def ranking(page_relation):
     rank = 0
     get_time = 0
+    get_start = time.time()
+    page_query = 'SELECT * FROM pagerank Where '
     for page in page_relation:
         # dynamodb에 올려져 있는 해당 페이지의 rank를 가져옵니다.
-        get_start = time.time()
-        past_rank, relation_length = get_past_pagerank(page)
-        get_time += time.time() - get_start
+        page_query += 'page=' + page + ' OR '
+    page_query = page_query[:len(page_query) - 3]
+    past_pagerank = get_past_pagerank(page_query)
+    get_time += time.time() - get_start
+    for page_data in past_pagerank:
+        past_rank = page_data[2]
+        relation_length = page_data[3]
         rank += (past_rank / relation_length)
     rank *= dampen_factor
     return rank, get_time
@@ -104,7 +110,8 @@ def ranking_each_page(page, page_relation, iter, remain_page):
             'get_time': get_time,
             'rank_time': rank_time,
             'put_time': put_time,
-            'page_rank': page_rank}
+            'page_rank': page_rank,
+            'relation_length': len(page_relation)}
 
 
 def lambda_handler(event, context):
@@ -112,13 +119,15 @@ def lambda_handler(event, context):
     end_iter = event['end_iter']
     remain_page = event['remain_page']
     file = event['file']
+    # os.chdir("/mnt/efs")
+
     page_relations = get_s3_object(bucket, file)
     try:
         for page, page_relation in page_relations.items():
             ranking_result = ranking_each_page(page, page_relation, current_iter, remain_page)
             print(ranking_result)
         # current_iter = end_iter이 되기 전 까지 다음 iteration 람다를 invoke합니다.
-        if current_iter <= end_iter:
+        if current_iter < end_iter:
             invoke_lambda(current_iter + 1, end_iter, remain_page, file)
     except Exception as e:
         print('error', e)
