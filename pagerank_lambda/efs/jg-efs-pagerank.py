@@ -21,7 +21,7 @@ lambda_client = boto3.client('lambda', config=lambda_config)
 lambda_name = 'jg-efs-pagerank'
 bucket = "jg-pagerank-bucket2"
 rank_path = '/mnt/efs/' + 'rank_file'
-relation_path = '/mnt/efs/' + 'relation'
+relation_path = '/mnt/efs/' + 'page_relation'
 
 
 # 주어진 bucket 위치 경로에 파일 이름이 key인 object와 data를 저장합니다.
@@ -62,20 +62,17 @@ def get_past_pagerank(page):
             if f.read(1).decode() == "":
                 break
             rank += f.read(1).decode()
-            print(idx, ' ', rank)
         f.close()
 
     relation = ""
     with open(relation_path, 'r+b', 0) as f:
+        print('tset1')
         for idx in range(10):
             f.seek(page + idx)
-            if f.read(1).decode('unicode-escape') == "\u0000":
-                continue
-            relation += f.read(1).decode('unicode-escape')
-            print(relation)
+            relation += f.read(1).decode()
         f.close()
-        relation = relation.replace()
-    return float(rank), relation
+        relation = relation.rstrip('\x00')
+    return float(rank), int(relation)
 
 
 def put_efs(page, rank):
@@ -86,6 +83,7 @@ def put_efs(page, rank):
         fcntl.lockf(f, fcntl.LOCK_EX, 10, page, 1)
         for idx in range(10):
             f.seek(page + idx)
+            print(rank[idx])
             f.write(rank[idx].encode())
         # file lock : start_byte 부터 10개의 byte 범위를 unlock
         fcntl.lockf(f, fcntl.LOCK_UN, page, 1)
@@ -105,7 +103,7 @@ def ranking(page_relation):
         get_start = time.time()
         past_rank, relation_length = get_past_pagerank(page)
         get_time += time.time() - get_start
-        rank += past_rank / int(relation_length)
+        rank += past_rank / relation_length
     rank *= dampen_factor
     return rank, get_time
 

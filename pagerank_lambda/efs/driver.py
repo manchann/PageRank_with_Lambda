@@ -97,7 +97,7 @@ total_pages = get_s3_object(bucket, config['relationPrefix'] + 'total_page.txt')
 total_page_length = len(total_pages)
 pagerank_init = 1 / total_page_length
 rank_path = '/mnt/efs/ap/' + 'rank_file'
-relation_path = '/mnt/efs/ap/' + 'relation'
+relation_path = '/mnt/efs/ap/' + 'page_relation'
 
 init_return = []
 for page in total_pages:
