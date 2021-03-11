@@ -69,11 +69,11 @@ def get_past_pagerank(page):
     with open(relation_path, 'r+b', 0) as f:
         for idx in range(10):
             f.seek(page + idx)
-            if f.read(1).decode() == b"":
-                break
-            relation += f.read(1).decode()
+            if f.read(1).decode('unicode-escape') == "\u0000":
+                continue
+            relation += f.read(1).decode('unicode-escape')
+            print(relation)
         f.close()
-    print(relation)
     return float(rank), relation
 
 
@@ -102,9 +102,9 @@ def ranking(page_relation):
     for page in page_relation:
         # dynamodb에 올려져 있는 해당 페이지의 rank를 가져옵니다.
         get_start = time.time()
-        past_rank, relation = get_past_pagerank(page)
+        past_rank, relation_length = get_past_pagerank(page)
         get_time += time.time() - get_start
-        rank += past_rank
+        rank += past_rank / int(relation_length)
     rank *= dampen_factor
     return rank, get_time
 
