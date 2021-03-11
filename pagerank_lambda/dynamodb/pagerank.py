@@ -100,12 +100,11 @@ def lambda_handler(event, context):
     file = event['file']
     page_relations = get_s3_object(bucket, file)
     try:
-        for page, page_relation in page_relations.items():
-            ranking_result = ranking_each_page(page, page_relation, current_iter, remain_page)
-            print(ranking_result)
-        # current_iter = end_iter이 되기 전 까지 다음 iteration 람다를 invoke합니다.
-        if current_iter < end_iter:
-            invoke_lambda(current_iter + 1, end_iter, remain_page, file)
+        while current_iter > end_iter:
+            for page, page_relation in page_relations.items():
+                ranking_result = ranking_each_page(page, page_relation, current_iter, remain_page)
+                print(ranking_result)
+            current_iter += 1
     except:
         pass
     return True
