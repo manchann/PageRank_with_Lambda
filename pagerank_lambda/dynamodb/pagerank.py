@@ -90,8 +90,13 @@ def ranking_each_page(page, page_relation, iter, remain_page):
     put_start = time.time()
     put_dynamodb_items(page, iter, page_rank, len(page_relation))
     put_time = time.time() - put_start
-    return {'iter': iter, 'page': page, 'get_time': get_time, 'rank_time': rank_time, 'put_time': put_time}
-
+    return {'iter': iter,
+            'page': page,
+            'get_time': get_time,
+            'rank_time': rank_time,
+            'put_time': put_time,
+            'page_rank': page_rank,
+            'relation_length': len(page_relation)}
 
 def lambda_handler(event, context):
     current_iter = event['current_iter']

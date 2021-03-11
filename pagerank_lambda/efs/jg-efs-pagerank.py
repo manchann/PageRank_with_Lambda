@@ -118,8 +118,13 @@ def ranking_each_page(page, page_relation, iter, remain_page):
     put_start = time.time()
     put_efs(page, page_rank)
     put_time = time.time() - put_start
-    return {'iter': iter, 'page': page, 'get_time': get_time, 'rank_time': rank_time, 'put_time': put_time,
-            'page_rank': page_rank}
+    return {'iter': iter,
+            'page': page,
+            'get_time': get_time,
+            'rank_time': rank_time,
+            'put_time': put_time,
+            'page_rank': page_rank,
+            'relation_length': len(page_relation)}
 
 
 def lambda_handler(event, context):
