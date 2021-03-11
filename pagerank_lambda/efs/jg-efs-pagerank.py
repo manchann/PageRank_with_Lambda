@@ -74,6 +74,7 @@ def get_past_pagerank(page):
             relation += f.read(1).decode('unicode-escape')
             print(relation)
         f.close()
+        relation = relation.replace()
     return float(rank), relation
 
 
