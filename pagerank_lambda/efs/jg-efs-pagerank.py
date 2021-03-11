@@ -18,7 +18,7 @@ lambda_read_timeout = 300
 boto_max_connections = 1000
 lambda_config = Config(read_timeout=lambda_read_timeout, max_pool_connections=boto_max_connections)
 lambda_client = boto3.client('lambda', config=lambda_config)
-lambda_name = 'pagerank'
+lambda_name = 'jg-efs-pagerank'
 bucket = "jg-pagerank-bucket2"
 rank_path = '/mnt/efs/' + 'rank_file'
 relation_path = '/mnt/efs/' + 'relation'
@@ -129,14 +129,11 @@ def lambda_handler(event, context):
     file = event['file']
     page_relations = get_s3_object(bucket, file)
     try:
-        for page, page_relation in page_relations.items():
-            ranking_result = ranking_each_page(page, page_relation, current_iter, remain_page)
-            print(ranking_result)
-        # current_iter = end_iter이 되기 전 까지 다음 iteration 람다를 invoke합니다.
-        if current_iter < end_iter:
-            print(file)
-            print(current_iter)
-            invoke_lambda(current_iter + 1, end_iter, remain_page, file)
+        while current_iter > end_iter:
+            for page, page_relation in page_relations.items():
+                ranking_result = ranking_each_page(page, page_relation, current_iter, remain_page)
+                print(ranking_result)
+            current_iter += 1
     except Exception as e:
         print('error', e)
         return True
