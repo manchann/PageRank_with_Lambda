@@ -129,7 +129,7 @@ def lambda_handler(event, context):
     file = event['file']
     page_relations = get_s3_object(bucket, file)
     try:
-        while current_iter > end_iter:
+        while current_iter <= end_iter:
             for page, page_relation in page_relations.items():
                 ranking_result = ranking_each_page(page, page_relation, current_iter, remain_page)
                 print(ranking_result)
