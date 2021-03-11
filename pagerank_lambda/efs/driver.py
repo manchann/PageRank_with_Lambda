@@ -115,11 +115,11 @@ for page in total_pages:
     try:
         relation_length = len(page_relations[page])
     except:
-        relation_length = ['-1']
+        relation_length = 1
     with open(relation_path, 'r+b', 0) as f:
         # file lock : start_byte 부터 10개의 byte 범위를 lock
         fcntl.lockf(f, fcntl.LOCK_EX, 10, distance, 1)
-        for idx in range(len(relation_length)):
+        for idx in range(relation_length):
             f.seek(distance + idx)
             f.write(relation_length[idx].encode())
         # file lock : start_byte 부터 10개의 byte 범위를 unlock
