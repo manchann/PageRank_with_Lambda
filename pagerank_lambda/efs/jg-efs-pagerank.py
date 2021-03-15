@@ -11,8 +11,6 @@ import fcntl
 s3 = boto3.resource('s3')
 s3_client = boto3.client('s3')
 dynamodb = boto3.resource('dynamodb')
-db_name = 'jg-pagerank'
-rank_table = dynamodb.Table(db_name)
 
 lambda_read_timeout = 300
 boto_max_connections = 1000
@@ -49,45 +47,46 @@ def invoke_lambda(current_iter, end_iter, remain_page, file):
             "file": file,
         })
     )
-    print('invoke 완료', current_iter)
     return True
 
 
+rank_file = open(rank_path, 'r+b', 0)
+relation_file = open(relation_path, 'r+b', 0)
+
+
 def get_past_pagerank(page):
-    page = int(page) * 10
+    seek = int(page) * 10
     rank = ""
-    with open(rank_path, 'r+b', 0) as f:
-        for idx in range(10):
-            f.seek(page + idx - 1)
-            if f.read(1).decode() == "":
-                break
-            rank += f.read(1).decode()
-        f.close()
+    for idx in range(10):
+        rank_file.seek(seek + idx)
+        rank += rank_file.read(1).decode()
+    rank = rank.rstrip('\x00')
+    print('rank: ', rank)
 
     relation = ""
-    with open(relation_path, 'r+b', 0) as f:
-        print('tset1')
-        for idx in range(10):
-            f.seek(page + idx)
-            relation += f.read(1).decode()
-        f.close()
-        relation = relation.rstrip('\x00')
+    for idx in range(10):
+        relation_file.seek(seek + idx)
+        relation += relation_file.read(1).decode()
+    relation = relation.rstrip('\x00')
+    print('relation ', relation)
     return float(rank), int(relation)
 
 
 def put_efs(page, rank):
-    page = int(page) * 10
+    seek = int(page) * 10
     rank = str(rank)
-    with open(rank_path, 'r+b', 0) as f:
-        # file lock : start_byte 부터 10개의 byte 범위를 lock
-        fcntl.lockf(f, fcntl.LOCK_EX, 10, page, 1)
-        for idx in range(10):
-            f.seek(page + idx)
-            print(rank[idx])
-            f.write(rank[idx].encode())
+    # file lock : start_byte 부터 10개의 byte 범위를 lock
+    fcntl.lockf(rank_file, fcntl.LOCK_EX, 10, seek, 1)
+    for idx in range(len(rank)):
+        if idx >= 10:
+            break
+        rank_file.seek(seek + idx)
+        rank_file.write(rank[idx].encode())
+        print('rank once: ', rank[idx])
         # file lock : start_byte 부터 10개의 byte 범위를 unlock
-        fcntl.lockf(f, fcntl.LOCK_UN, page, 1)
-        f.close()
+    fcntl.lockf(rank_file, fcntl.LOCK_UN, 10, seek, 1)
+    # rank_file.close()
+    print('put ', rank)
     return rank
 
 
