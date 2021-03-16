@@ -108,17 +108,17 @@ cur = conn.cursor(pymysql.cursors.DictCursor)
 # cur.execute(
 #     "CREATE TABLE pagerank (page VARCHAR(255) NOT NULL, iter VARCHAR(255) NOT NULL, rank VARCHAR(255) NOT NULL, relation_length VARCHAR(255) NOT NULL)"
 # )
-# cur.execute('use pagerank')
-for page in total_pages:
-    try:
-        page_relation = page_relations[page]
-    except:
-        page_relation = ['-1']
-    cur.execute("""
-        INSERT INTO pagerank (page,iter,rank,relation_length) VALUES(%s,%s,%s,%s)""",
-                (page, 0, pagerank_init, len(page_relation)))
-    print(cur.fetchone())
-    conn.commit()
+cur.execute('use pagerank')
+cur.execute('select * from pagerank')
+# for page in total_pages:
+#     try:
+#         page_relation = page_relations[page]
+#     except:
+#         page_relation = ['-1']
+#     cur.execute('INSERT INTO pagerank (page,iter,rank,relation_length) VALUES(%s,%s,%s,%s)',
+#                 (page, 0, pagerank_init, len(page_relation)))
+#     print(cur.fetchone())
+#     conn.commit()
 
 print('init 끝')
 # 모든 page의 초기 Rank값은 1/(전체 페이지 수) 의 값을 가집니다.
