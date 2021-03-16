@@ -16,7 +16,7 @@ boto_max_connections = 1000
 lambda_config = Config(read_timeout=lambda_read_timeout, max_pool_connections=boto_max_connections)
 lambda_client = boto3.client('lambda', config=lambda_config)
 lambda_name = 'pagerank'
-bucket = "jg-pagerank-bucket"
+bucket = "jg-pagerank-bucket2"
 
 db_name = 'pagerank'
 host = "jg-pagerank.cluster-c3idypdw48si.us-west-2.rds.amazonaws.com"
@@ -64,7 +64,7 @@ def get_past_pagerank(query):
 
 
 def put_efs(page, rank, iter, relation_length):
-    cur.execute('INSERT OR REPLACE INTO pagerank(page, iter, rank, relation_length) VALUES (?,?,?,?)',
+    cur.execute('REPLACE INTO pagerank(page, iter, rank, relation_length) VALUES (%s,%s,%s,%s)',
                 (page, iter, rank, relation_length))
     conn.commit()
     return rank
@@ -86,8 +86,8 @@ def ranking(page_relation):
     past_pagerank = get_past_pagerank(page_query)
     get_time += time.time() - get_start
     for page_data in past_pagerank:
-        past_rank = page_data['rank']
-        relation_length = page_data['relation_length']
+        past_rank = float(page_data['rank'])
+        relation_length = int(page_data['relation_length'])
         rank += (past_rank / relation_length)
     rank *= dampen_factor
     return rank, get_time
