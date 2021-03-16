@@ -108,6 +108,7 @@ cur = conn.cursor(pymysql.cursors.DictCursor)
 # cur.execute(
 #     "CREATE TABLE pagerank (page VARCHAR(255) NOT NULL, iter VARCHAR(255) NOT NULL, rank VARCHAR(255) NOT NULL, relation_length VARCHAR(255) NOT NULL)"
 # )
+cur.execute('DROP table pagerank')
 cur.execute('use pagerank')
 cur.execute('select * from pagerank')
 # for page in total_pages:
