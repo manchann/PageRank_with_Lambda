@@ -5,20 +5,29 @@ import time
 import decimal
 from botocore.client import Config
 from threading import Thread
+import pymysql
 
 # S3 session 생성
 s3 = boto3.resource('s3')
 s3_client = boto3.client('s3')
-dynamodb = boto3.resource('dynamodb')
-db_name = 'jg-pagerank'
-rank_table = dynamodb.Table(db_name)
 
 lambda_read_timeout = 300
 boto_max_connections = 1000
 lambda_config = Config(read_timeout=lambda_read_timeout, max_pool_connections=boto_max_connections)
 lambda_client = boto3.client('lambda', config=lambda_config)
 lambda_name = 'pagerank'
-bucket = "jg-pagerank-bucket2"
+bucket = "jg-pagerank-bucket"
+
+db_name = 'pagerank'
+host = "jg-pagerank.cluster-c3idypdw48si.us-west-2.rds.amazonaws.com"
+port = 3306
+user_name = 'admin'
+pwd = '12345678'
+
+conn = pymysql.connect(host=host, user=user_name, port=port,
+                       passwd=pwd, db=db_name)
+
+cur = conn.cursor(pymysql.cursors.DictCursor)
 
 
 # 주어진 bucket 위치 경로에 파일 이름이 key인 object와 data를 저장합니다.
@@ -48,20 +57,17 @@ def invoke_lambda(current_iter, end_iter, remain_page, file):
     )
 
 
-def get_past_pagerank(t, page):
-    past_pagerank = t.get_item(Key={'page': str(page)})
-    return past_pagerank['Item']
+def get_past_pagerank(query):
+    cur.execute(query)
+    ret = cur.fetchall()
+    return ret
 
 
-def put_dynamodb_items(page, iter, rank, relation_length):
-    rank_table.put_item(
-        Item={
-            'iter': iter,
-            'page': str(page),
-            'rank': decimal.Decimal(str(rank)),
-            'relation_length': decimal.Decimal(str(relation_length))
-        }
-    )
+def put_efs(page, rank, iter, relation_length):
+    cur.execute('INSERT OR REPLACE INTO pagerank VALUES (page, iter, rank, relation_length)',
+                (page, iter, rank, relation_length))
+    conn.commit()
+    return rank
 
 
 dampen_factor = 0.8
@@ -71,12 +77,18 @@ dampen_factor = 0.8
 def ranking(page_relation):
     rank = 0
     get_time = 0
+    page_query = 'SELECT * FROM pagerank Where '
     for page in page_relation:
         # dynamodb에 올려져 있는 해당 페이지의 rank를 가져옵니다.
-        get_start = time.time()
-        past_info = get_past_pagerank(rank_table, page)
-        get_time += time.time() - get_start
-        rank += float(past_info['rank']) / float(past_info['relation_length'])
+        page_query += 'page=' + page + ' OR '
+    page_query = page_query[:len(page_query) - 3]
+    get_start = time.time()
+    past_pagerank = get_past_pagerank(page_query)
+    get_time += time.time() - get_start
+    for page_data in past_pagerank:
+        past_rank = page_data['rank']
+        relation_length = page_data['relation_length']
+        rank += (past_rank / relation_length)
     rank *= dampen_factor
     return rank, get_time
 
@@ -88,7 +100,7 @@ def ranking_each_page(page, page_relation, iter, remain_page):
     page_rank = rank + remain_page
     rank_time = time.time() - rank_start
     put_start = time.time()
-    put_dynamodb_items(page, iter, page_rank, len(page_relation))
+    put_efs(page, page_rank, iter, len(page_relation))
     put_time = time.time() - put_start
     return {'iter': iter,
             'page': page,
@@ -98,11 +110,14 @@ def ranking_each_page(page, page_relation, iter, remain_page):
             'page_rank': page_rank,
             'relation_length': len(page_relation)}
 
+
 def lambda_handler(event, context):
     current_iter = event['current_iter']
     end_iter = event['end_iter']
     remain_page = event['remain_page']
     file = event['file']
+    # os.chdir("/mnt/efs")
+
     page_relations = get_s3_object(bucket, file)
     try:
         while current_iter <= end_iter:
@@ -110,6 +125,7 @@ def lambda_handler(event, context):
                 ranking_result = ranking_each_page(page, page_relation, current_iter, remain_page)
                 print(ranking_result)
             current_iter += 1
-    except:
-        pass
+    except Exception as e:
+        print('error', e)
+        return True
     return True

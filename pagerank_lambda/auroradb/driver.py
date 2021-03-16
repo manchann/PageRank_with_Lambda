@@ -9,16 +9,13 @@ import time
 from botocore.client import Config
 from boto3.dynamodb.types import DYNAMODB_CONTEXT
 from threading import Thread
-import fcntl
-import sqlite3
+import pymysql
 
 os.system('export serverless_mapreduce_role=arn:aws:iam::741926482963:role/biglambda_role')
 
 s3 = boto3.resource('s3')
 s3_client = boto3.client('s3')
 dynamodb = boto3.resource('dynamodb', region_name='us-west-2')
-db_name = 'jg-pagerank'
-table = dynamodb.Table(db_name)
 
 config = json.loads(open('driverconfig.json', 'r').read())
 
@@ -33,6 +30,12 @@ lambda_zip = config["lambda"]["zip"]
 
 lambda_config = Config(read_timeout=lambda_read_timeout, max_pool_connections=boto_max_connections)
 lambda_client = boto3.client('lambda', config=lambda_config)
+
+db_name = 'pagerank'
+host = "jg-pagerank.cluster-c3idypdw48si.us-west-2.rds.amazonaws.com"
+port = 3306
+user_name = 'admin'
+pwd = '12345678'
 
 
 def write_to_s3(bucket, key, data):
@@ -63,7 +66,6 @@ def invoke_lambda(current_iter, end_iter, remain_page, file, pagerank_init):
             "pagerank_init": pagerank_init
         })
     )
-    return True
 
 
 def get_s3_object(bucket, key):
@@ -76,6 +78,8 @@ def get_page_relation(file):
     return get_s3_object(bucket, config['relationPrefix'] + file)
 
 
+# DynamoDB에 있는 모든 값을 지웁니다.
+
 # zipLambda(lambda_name, lambda_zip)
 # l_pagerank = lambdautils.LambdaManager(lambda_client, s3_client, region, config["lambda"]["zip"], lambda_name,
 #                                        config["lambda"]["handler"])
@@ -85,6 +89,7 @@ def get_page_relation(file):
 page_relations = {}
 divided_page_num = config["divided_page_num"]
 invoked_lambda_num = config["invoked_lambda_num"]
+
 # 전체 페이지의 개수를 계산합니다.
 for i in range(invoked_lambda_num + 1):
     print(i)
@@ -96,18 +101,17 @@ total_pages = get_s3_object(bucket, config['relationPrefix'] + 'total_page.txt')
 
 total_page_length = len(total_pages)
 pagerank_init = 1 / total_page_length
-db_name = 'pagerank.db'
-db_path = '/mnt/efs/ap/' + db_name
 
-conn = sqlite3.connect(db_path)
-cur = conn.cursor()
+conn = pymysql.connect(host=host, user=user_name, port=port,
+                       passwd=pwd, db=db_name)
+cur = conn.cursor(pymysql.cursors.DictCursor)
 
 for page in total_pages:
     try:
         page_relation = page_relations[page]
     except:
         page_relation = ['-1']
-    cur.execute('INSERT OR REPLACE INTO pagerank VALUES (?,?,?,?)',
+    cur.execute('INSERT OR REPLACE INTO pagerank VALUES (page,iter,rank,relation_length)',
                 (page, 0, pagerank_init, len(page_relation)))
     print(cur.fetchone())
     conn.commit()
@@ -116,9 +120,9 @@ print('init 끝')
 # 모든 page의 초기 Rank값은 1/(전체 페이지 수) 의 값을 가집니다.
 
 # 앞서 zip으로 만든 파일이 Lambda에 업로드 되었으므로 로컬에서의 zip파일을 삭제합니다.
-# removeZip(lambda_zip)
+removeZip(lambda_zip)
 # 반복 횟수를 설정합니다.
-end_iter = 2
+end_iter = 3
 dampen_factor = 0.8
 remain_page = (1 - dampen_factor) / total_page_length
 

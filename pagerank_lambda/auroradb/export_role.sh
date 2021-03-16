@@ -1,0 +1,1 @@
+export serverless_mapreduce_role=arn:aws:iam::741926482963:role/biglambda_role
