@@ -114,7 +114,7 @@ for page in total_pages:
         page_relation = page_relations[page]
     except:
         page_relation = ['-1']
-    cur.execute('INSERT OR REPLACE INTO pagerank VALUES (page,iter,rank,relation_length)',
+    cur.execute('INSERT OR REPLACE INTO pagerank(page,iter,rank,relation_length) VALUES(?,?,?,?)',
                 (page, 0, pagerank_init, len(page_relation)))
     print(cur.fetchone())
     conn.commit()
