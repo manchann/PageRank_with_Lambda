@@ -105,7 +105,7 @@ pagerank_init = 1 / total_page_length
 conn = pymysql.connect(host=host, user=user_name, port=port,
                        passwd=pwd, db=db_name)
 cur = conn.cursor(pymysql.cursors.DictCursor)
-query = "CREATE TABLE pagerank ('page' VARCHAR(255) NOT NULL, 'iter' VARCHAR(255) NOT NULL, 'rank' VARCHAR(255) NOT NULL, 'relation_length' VARCHAR(255) NOT NULL)"
+query = "CREATE TABLE pagerank (page VARCHAR(255) NOT NULL, iter VARCHAR(255) NOT NULL, rank VARCHAR(255) NOT NULL, relation_length VARCHAR(255) NOT NULL)"
 cur.execute(query)
 
 for page in total_pages:
