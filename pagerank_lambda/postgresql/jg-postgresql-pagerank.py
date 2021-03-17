@@ -76,7 +76,6 @@ dampen_factor = 0.8
 # 랭크를 계산합니다.
 def ranking(page_relation):
     rank = 0
-    get_time = 0
     page_query = 'SELECT * FROM pagerank Where '
     for page in page_relation:
         # dynamodb에 올려져 있는 해당 페이지의 rank를 가져옵니다.
@@ -84,7 +83,7 @@ def ranking(page_relation):
     page_query = page_query[:len(page_query) - 3]
     get_start = time.time()
     past_pagerank = get_past_pagerank(page_query)
-    get_time += time.time() - get_start
+    get_time = time.time() - get_start
     for page_data in past_pagerank:
         past_rank = float(page_data[2])
         relation_length = int(page_data[3])
