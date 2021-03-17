@@ -64,7 +64,7 @@ def get_past_pagerank(query):
 
 
 def put_efs(page, rank, iter, relation_length):
-    cur.execute('REPLACE INTO pagerank(page, iter, rank, relation_length) VALUES (%s,%s,%s,%s)',
+    cur.execute("UPDATE pagerank SET iter = %s, rank = %s WHERE iter = %s",
                 (page, iter, rank, relation_length))
     conn.commit()
     return rank
@@ -80,14 +80,14 @@ def ranking(page_relation):
     page_query = 'SELECT * FROM pagerank Where '
     for page in page_relation:
         # dynamodb에 올려져 있는 해당 페이지의 rank를 가져옵니다.
-        page_query += 'page=' + page + ' OR '
+        page_query += "page = '" + page + "' OR "
     page_query = page_query[:len(page_query) - 3]
     get_start = time.time()
     past_pagerank = get_past_pagerank(page_query)
     get_time += time.time() - get_start
     for page_data in past_pagerank:
-        past_rank = float(page_data['rank'])
-        relation_length = int(page_data['relation_length'])
+        past_rank = float(page_data[2])
+        relation_length = int(page_data[3])
         rank += (past_rank / relation_length)
     rank *= dampen_factor
     return rank, get_time
@@ -116,7 +116,6 @@ def lambda_handler(event, context):
     end_iter = event['end_iter']
     remain_page = event['remain_page']
     file = event['file']
-    # os.chdir("/mnt/efs")
 
     page_relations = get_s3_object(bucket, file)
     try:
