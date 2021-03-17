@@ -90,9 +90,9 @@ def dynamodb_remove_all_items():
 dynamodb_remove_all_items()
 time.sleep(10)
 
-zipLambda(lambda_name, lambda_zip)
-l_pagerank = lambdautils.LambdaManager(lambda_client, s3_client, region, config["lambda"]["zip"], lambda_name,
-                                       config["lambda"]["handler"])
+# zipLambda(lambda_name, lambda_zip)
+# l_pagerank = lambdautils.LambdaManager(lambda_client, s3_client, region, config["lambda"]["zip"], lambda_name,
+#                                        config["lambda"]["handler"])
 # l_pagerank.update_code_or_create_on_noexist()
 
 # page의 관계들이 담겨있는 파일을 가지고 dictionary 관계 데이터셋을 만듭니다.
@@ -151,7 +151,7 @@ print('init 끝')
 # 앞서 zip으로 만든 파일이 Lambda에 업로드 되었으므로 로컬에서의 zip파일을 삭제합니다.
 removeZip(lambda_zip)
 # 반복 횟수를 설정합니다.
-end_iter = 10
+end_iter = 3
 dampen_factor = 0.8
 remain_page = (1 - dampen_factor) / total_page_length
 
@@ -159,16 +159,16 @@ print('pages 총 개수:', total_page_length)
 print('pages 분할 개수:', divided_page_num)
 
 # S3의 나뉘어진 파일 수 만큼 람다를 병렬적으로 Invoke합니다.
-# t_return = []
-# for idx in range(102 + 1):
-#     s3_file_path = config['relationPrefix'] + str(idx) + '.txt'
-#     print(idx, '번째 invoking')
-#     t = Thread(target=invoke_lambda,
-#                args=(1, end_iter, remain_page, s3_file_path, pagerank_init))
-#     t.start()
-#     t_return.append(t)
-# for t in t_return:
-#     t.join()
+t_return = []
+for idx in range(10):
+    s3_file_path = config['relationPrefix'] + str(idx) + '.txt'
+    print(idx, '번째 invoking')
+    t = Thread(target=invoke_lambda,
+               args=(1, end_iter, remain_page, s3_file_path, pagerank_init))
+    t.start()
+    t_return.append(t)
+for t in t_return:
+    t.join()
 #
 # for idx in range(invoked_lambda_num + 1):
 #     try:

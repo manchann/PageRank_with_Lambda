@@ -12,8 +12,8 @@
   "divided_page_num": 1000,
   "invoked_lambda_num": 4840,
   "lambda": {
-    "name": "jg-pagerank",
-    "handler": "pagerank.lambda_handler",
+    "name": "jg-aurora-postgresql-pagerank",
+    "handler": "lambda_function.lambda_handler",
     "zip": "jg-pagerank.zip"
   }
 }
