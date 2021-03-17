@@ -32,7 +32,7 @@ lambda_config = Config(read_timeout=lambda_read_timeout, max_pool_connections=bo
 lambda_client = boto3.client('lambda', config=lambda_config)
 
 db_name = 'pagerank'
-host = "jg-pagerank-postgresql.c3idypdw48si.us-west-2.rds.amazonaws.com"
+host = "jg-aurora-postgresql-pagerank.cluster-c3idypdw48si.us-west-2.rds.amazonaws.com"
 port = 5432
 user_name = 'jg'
 pwd = '12345678'
