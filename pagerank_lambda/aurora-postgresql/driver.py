@@ -106,7 +106,7 @@ conn = psycopg2.connect(host=host, user=user_name, port=port,
                         password=pwd, database=db_name)
 cur = conn.cursor()
 cur.execute(
-    "CREATE TABLE pagerank (page VARCHAR(255) NOT NULL, iter VARCHAR(255) NOT NULL, rank VARCHAR(255), relation_length VARCHAR(255), primary key(page))"
+    "CREATE TABLE pagerank (page VARCHAR(255) NOT NULL, iter VARCHAR(255) NOT NULL, `rank` VARCHAR(255), relation_length VARCHAR(255), primary key(page))"
 )
 
 for page in total_pages:
@@ -114,7 +114,7 @@ for page in total_pages:
         page_relation = page_relations[page]
     except:
         page_relation = ['-1']
-    cur.execute('INSERT INTO pagerank (page,iter,rank,relation_length) VALUES(%s,%s,%s,%s);',
+    cur.execute('INSERT INTO pagerank (page,iter,`rank`,relation_length) VALUES(%s,%s,%s,%s);',
                 (page, 0, pagerank_init, len(page_relation)))
     print('page insert')
     conn.commit()
