@@ -105,7 +105,6 @@ pagerank_init = 1 / total_page_length
 conn = psycopg2.connect(host=host, user=user_name, port=port,
                         password=pwd, database=db_name)
 cur = conn.cursor()
-cur.execute('DROP table pagerank')
 cur.execute(
     "CREATE TABLE pagerank (page VARCHAR(255) NOT NULL, iter VARCHAR(255) NOT NULL, rank VARCHAR(255), relation_length VARCHAR(255), primary key(page))"
 )
