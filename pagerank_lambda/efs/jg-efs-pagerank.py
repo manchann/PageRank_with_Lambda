@@ -61,14 +61,12 @@ def get_past_pagerank(page):
         rank_file.seek(seek + idx)
         rank += rank_file.read(1).decode()
     rank = rank.rstrip('\x00')
-    print('rank: ', rank)
 
     relation = ""
     for idx in range(10):
         relation_file.seek(seek + idx)
         relation += relation_file.read(1).decode()
     relation = relation.rstrip('\x00')
-    print('relation ', relation)
     return float(rank), int(relation)
 
 
@@ -82,11 +80,9 @@ def put_efs(page, rank):
             break
         rank_file.seek(seek + idx)
         rank_file.write(rank[idx].encode())
-        print('rank once: ', rank[idx])
         # file lock : start_byte 부터 10개의 byte 범위를 unlock
     fcntl.lockf(rank_file, fcntl.LOCK_UN, 10, seek, 1)
     # rank_file.close()
-    print('put ', rank)
     return rank
 
 
