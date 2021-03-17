@@ -25,7 +25,7 @@ user_name = 'jg'
 pwd = '12345678'
 
 conn = psycopg2.connect(host=host, user=user_name, port=port,
-                       password=pwd, database=db_name)
+                        password=pwd, database=db_name)
 
 cur = conn.cursor()
 
@@ -64,8 +64,8 @@ def get_past_pagerank(query):
 
 
 def put_efs(page, rank, iter, relation_length):
-    cur.execute("UPDATE pagerank SET iter = %s, rank = %s WHERE iter = %s",
-                (page, iter, rank, relation_length))
+    cur.execute("UPDATE pagerank SET iter = %s, rank = %s WHERE page = %s",
+                (iter, rank, page))
     conn.commit()
     return rank
 
