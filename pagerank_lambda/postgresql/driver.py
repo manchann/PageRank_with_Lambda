@@ -106,7 +106,7 @@ conn = psycopg2.connect(host=host, user=user_name, port=port,
                        password=pwd, database=db_name)
 cur = conn.cursor()
 cur.execute(
-    "CREATE TABLE pagerank (page VARCHAR(255) NOT NULL, iter VARCHAR(255) NOT NULL, `rank` VARCHAR(255), `relation_length` VARCHAR(255));"
+    "CREATE TABLE pagerank (page VARCHAR(255) NOT NULL, iter VARCHAR(255) NOT NULL, rank VARCHAR(255), relation_length VARCHAR(255));"
 )
 
 for page in total_pages:
