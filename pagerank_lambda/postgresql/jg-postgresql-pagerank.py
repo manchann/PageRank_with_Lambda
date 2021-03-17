@@ -64,7 +64,7 @@ def get_past_pagerank(query):
 
 
 def put_efs(page, rank, iter, relation_length):
-    cur.execute('REPLACE INTO pagerank(page, iter, `rank`, `relation_length`) VALUES (%s,%s,%s,%s)',
+    cur.execute('REPLACE INTO pagerank(page, iter, rank, relation_length) VALUES (%s,%s,%s,%s)',
                 (page, iter, rank, relation_length))
     conn.commit()
     return rank
