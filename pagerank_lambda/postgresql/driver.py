@@ -9,7 +9,7 @@ import time
 from botocore.client import Config
 from boto3.dynamodb.types import DYNAMODB_CONTEXT
 from threading import Thread
-import pymysql
+import psycopg2
 
 os.system('export serverless_mapreduce_role=arn:aws:iam::741926482963:role/biglambda_role')
 
@@ -32,9 +32,9 @@ lambda_config = Config(read_timeout=lambda_read_timeout, max_pool_connections=bo
 lambda_client = boto3.client('lambda', config=lambda_config)
 
 db_name = 'pagerank'
-host = "jg-pagerank.cluster-c3idypdw48si.us-west-2.rds.amazonaws.com"
+host = "jg-pagerank-postgresql.c3idypdw48si.us-west-2.rds.amazonaws.com"
 port = 3306
-user_name = 'admin'
+user_name = 'jg'
 pwd = '12345678'
 
 
@@ -102,19 +102,19 @@ total_pages = get_s3_object(bucket, config['relationPrefix'] + 'total_page.txt')
 total_page_length = len(total_pages)
 pagerank_init = 1 / total_page_length
 
-conn = pymysql.connect(host=host, user=user_name, port=port,
-                       passwd=pwd, db=db_name)
-cur = conn.cursor(pymysql.cursors.DictCursor)
-# cur.execute(
-#     "CREATE TABLE pagerank(page VARCHAR(255), iter VARCHAR(255), rank VARCHAR(255), relation_length VARCHAR(255))"
-# )
+conn = psycopg2.connect(host=host, user=user_name, port=port,
+                       password=pwd, database=db_name)
+cur = conn.cursor()
+cur.execute(
+    "CREATE TABLE pagerank (page VARCHAR(255) NOT NULL, iter VARCHAR(255) NOT NULL, `rank` VARCHAR(255), `relation_length` VARCHAR(255));"
+)
 
 for page in total_pages:
     try:
         page_relation = page_relations[page]
     except:
         page_relation = ['-1']
-    cur.execute('INSERT INTO pagerank (page,iter,rank,relation_length) VALUES(%s,%s,%s,%s)',
+    cur.execute('INSERT INTO pagerank (page,iter,rank,relation_length) VALUES(%s,%s,%s,%s);',
                 (page, 0, pagerank_init, len(page_relation)))
     print(cur.fetchone())
     conn.commit()

@@ -19,13 +19,13 @@ lambda_name = 'pagerank'
 bucket = "jg-pagerank-bucket2"
 
 db_name = 'pagerank'
-host = "jg-pagerank.cluster-c3idypdw48si.us-west-2.rds.amazonaws.com"
+host = "jg-pagerank-postgresql.c3idypdw48si.us-west-2.rds.amazonaws.com"
 port = 3306
 user_name = 'jg'
 pwd = '12345678'
 
 conn = psycopg2.connect(host=host, user=user_name, port=port,
-                       password=pwd, dbname=db_name)
+                       password=pwd, database=db_name)
 
 cur = conn.cursor()
 
@@ -64,7 +64,7 @@ def get_past_pagerank(query):
 
 
 def put_efs(page, rank, iter, relation_length):
-    cur.execute('REPLACE INTO pagerank(page, iter, rank, relation_length) VALUES (%s,%s,%s,%s)',
+    cur.execute('REPLACE INTO pagerank(page, iter, `rank`, `relation_length`) VALUES (%s,%s,%s,%s)',
                 (page, iter, rank, relation_length))
     conn.commit()
     return rank
