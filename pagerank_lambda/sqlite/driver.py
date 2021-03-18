@@ -82,6 +82,7 @@ def get_page_relation(file):
 # l_pagerank.update_code_or_create_on_noexist()
 
 # page의 관계들이 담겨있는 파일을 가지고 dictionary 관계 데이터셋을 만듭니다.
+start = time.time()
 page_relations = {}
 divided_page_num = config["divided_page_num"]
 invoked_lambda_num = config["invoked_lambda_num"]
@@ -109,7 +110,7 @@ for page in total_pages:
         page_relation = ['-1']
     cur.execute('INSERT OR REPLACE INTO pagerank VALUES (?,?,?,?)',
                 (page, 0, pagerank_init, len(page_relation)))
-    print(page,' 페이지 진행 중')
+    print(page, ' 페이지 진행 중')
     conn.commit()
 
 print('init 끝')
@@ -144,3 +145,5 @@ for t in t_return:
 #         invoke_lambda(1, end_iter, remain_page, s3_file_path, pagerank_init)
 #     except:
 #         pass
+
+print('총 걸린 시간', time.time() - start)

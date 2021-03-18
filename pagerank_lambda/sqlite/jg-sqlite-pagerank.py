@@ -54,9 +54,10 @@ def invoke_lambda(current_iter, end_iter, remain_page, file):
     return True
 
 
-conn = sqlite3.connect(db_path, timeout=60000)
+conn = sqlite3.connect(db_path, timeout=300000)
 cur = conn.cursor()
 cur.execute('pragma journal_mode=wal')
+conn.commit()
 
 
 def get_past_pagerank(query):
@@ -133,5 +134,5 @@ def lambda_handler(event, context):
             current_iter += 1
     except Exception as e:
         print('error', e)
-        return True
+    cur.close()
     return True
