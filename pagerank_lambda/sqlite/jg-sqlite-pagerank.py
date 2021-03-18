@@ -60,15 +60,19 @@ cur.execute('pragma journal_mode=wal')
 
 
 def get_past_pagerank(query):
+    print('get try')
     cur.execute(query)
     ret = cur.fetchall()
+    print('get end')
     return ret
 
 
 def put_efs(page, rank, iter, relation_length):
+    print('put try')
     cur.execute('REPLACE INTO pagerank VALUES (?, ?, ?, ?)',
                 (page, iter, rank, relation_length))
     conn.commit()
+    print('put end')
     return rank
 
 
