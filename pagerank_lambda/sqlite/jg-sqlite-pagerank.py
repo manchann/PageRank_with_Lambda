@@ -54,7 +54,7 @@ def invoke_lambda(current_iter, end_iter, remain_page, file):
     return True
 
 
-conn = sqlite3.connect(db_path)
+conn = sqlite3.connect(db_path, timeout=60000)
 cur = conn.cursor()
 cur.execute('pragma journal_mode=wal')
 
@@ -71,6 +71,7 @@ def put_efs(page, rank, iter, relation_length):
     print('put try')
     cur.execute('REPLACE INTO pagerank VALUES (?, ?, ?, ?)',
                 (page, iter, rank, relation_length))
+    print('put commit try')
     conn.commit()
     print('put end')
     return rank
