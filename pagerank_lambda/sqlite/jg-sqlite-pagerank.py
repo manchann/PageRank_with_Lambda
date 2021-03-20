@@ -134,5 +134,5 @@ def lambda_handler(event, context):
             current_iter += 1
     except Exception as e:
         print('error', e)
-    cur.close()
+    conn.close()
     return True
