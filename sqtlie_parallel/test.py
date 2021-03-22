@@ -12,7 +12,9 @@ import os
 # S3 session 생성
 s3 = boto3.resource('s3')
 s3_client = boto3.client('s3')
-dynamodb = boto3.resource('dynamodb')
+dynamodb = boto3.resource('dynamodb', region_name='us-west-2')
+db_name = 'jg-sqlite-test'
+table = dynamodb.Table(db_name)
 
 lambda_read_timeout = 300
 boto_max_connections = 1000
@@ -23,7 +25,7 @@ lambda_name = 'jg-sqlite-pagerank'
 bucket = "jg-pagerank-bucket2"
 
 db_name = 'pagerank.db'
-db_path = '/mnt/efs/' + db_name
+db_path = './' + db_name
 
 
 # 주어진 bucket 위치 경로에 파일 이름이 key인 object와 data를 저장합니다.
@@ -55,21 +57,16 @@ def invoke_lambda(current_iter, end_iter, remain_page, file):
 
 
 def get_past_pagerank(query, conn):
-    print('get try')
     conn.cursor().execute(query)
     ret = conn.cursor().fetchall()
-    print('get end')
     return ret
 
 
 def put_efs(page, rank, iter, relation_length, conn):
-    print('put try')
     cur = conn.cursor()
     cur.execute('REPLACE INTO pagerank VALUES (?, ?, ?, ?)',
                 (page, iter, rank, relation_length))
-    print('put commit try')
     conn.commit()
-    print('put end')
     return rank
 
 
@@ -113,22 +110,43 @@ def ranking_each_page(page, page_relation, iter, remain_page, conn):
             'relation_length': len(page_relation)}
 
 
-def lambda_handler(event, context):
-    current_iter = event['current_iter']
-    end_iter = event['end_iter']
-    remain_page = event['remain_page']
-    file = event['file']
-    # os.chdir("/mnt/efs")
+def put_dynamodb(data):
+    table.put_item(
+        Item={
+            'page': str(data['page']),
+            'iter': data['iter']
+        }
+    )
 
+
+def lambda_handler(current_iter, end_iter, remain_page, file):
     page_relations = get_s3_object(bucket, file)
-    while current_iter <= end_iter:
-        conn = sqlite3.connect(db_path, timeout=30000000, check_same_thread=False)
-        cur = conn.cursor()
-        cur.execute('pragma journal_mode=wal')
-        cur.execute('pragma busy_timeout=10000000;')
-        conn.commit()
-        for page, page_relation in page_relations.items():
-            ranking_result = ranking_each_page(page, page_relation, current_iter, remain_page, conn)
-            print(ranking_result)
-        current_iter += 1
-        conn.close()
+    try:
+        while current_iter <= end_iter:
+            conn = sqlite3.connect(db_path, timeout=30000000, check_same_thread=False)
+            cur = conn.cursor()
+            cur.execute('pragma journal_mode=wal')
+            cur.execute('pragma busy_timeout=10000000;')
+            conn.commit()
+            for page, page_relation in page_relations.items():
+                ranking_result = ranking_each_page(page, page_relation, current_iter, remain_page, conn)
+                put_dynamodb(ranking_result)
+                # print(ranking_result)
+            current_iter += 1
+            conn.close()
+    except Exception as e:
+        print('error: ', e)
+
+
+config = json.loads(open('driverconfig.json', 'r').read())
+
+t_return = []
+for idx in range(10):
+    s3_file_path = config['relationPrefix'] + str(idx) + '.txt'
+    print(idx, '번째 invoking')
+    t = Thread(target=lambda_handler,
+               args=(1, 3, 1, s3_file_path,))
+    t.start()
+    t_return.append(t)
+for t in t_return:
+    t.join()
