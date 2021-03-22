@@ -54,22 +54,17 @@ def invoke_lambda(current_iter, end_iter, remain_page, file):
     return True
 
 
-conn = sqlite3.connect(db_path, timeout=300000)
-cur = conn.cursor()
-cur.execute('pragma journal_mode=wal')
-conn.commit()
-
-
-def get_past_pagerank(query):
+def get_past_pagerank(query, conn):
     print('get try')
-    cur.execute(query)
-    ret = cur.fetchall()
+    conn.cursor().execute(query)
+    ret = conn.cursor().fetchall()
     print('get end')
     return ret
 
 
-def put_efs(page, rank, iter, relation_length):
+def put_efs(page, rank, iter, relation_length, conn):
     print('put try')
+    cur = conn.cursor()
     cur.execute('REPLACE INTO pagerank VALUES (?, ?, ?, ?)',
                 (page, iter, rank, relation_length))
     print('put commit try')
@@ -82,7 +77,7 @@ dampen_factor = 0.8
 
 
 # 랭크를 계산합니다.
-def ranking(page_relation):
+def ranking(page_relation, conn):
     rank = 0
     page_query = 'SELECT * FROM pagerank Where '
     for page in page_relation:
@@ -90,7 +85,7 @@ def ranking(page_relation):
         page_query += 'page=' + page + ' OR '
     page_query = page_query[:len(page_query) - 3]
     get_start = time.time()
-    past_pagerank = get_past_pagerank(page_query)
+    past_pagerank = get_past_pagerank(page_query, conn)
     get_time = time.time() - get_start
     for page_data in past_pagerank:
         past_rank = page_data[2]
@@ -101,13 +96,13 @@ def ranking(page_relation):
 
 
 # 각각 페이지에 대하여 rank를 계산하고 dynamodb에 업데이트 합니다.
-def ranking_each_page(page, page_relation, iter, remain_page):
+def ranking_each_page(page, page_relation, iter, remain_page, conn):
     rank_start = time.time()
-    rank, get_time = ranking(page_relation)
+    rank, get_time = ranking(page_relation, conn)
     page_rank = rank + remain_page
     rank_time = time.time() - rank_start
     put_start = time.time()
-    put_efs(page, page_rank, iter, len(page_relation))
+    put_efs(page, page_rank, iter, len(page_relation), conn)
     put_time = time.time() - put_start
     return {'iter': iter,
             'page': page,
@@ -123,16 +118,18 @@ def lambda_handler(event, context):
     end_iter = event['end_iter']
     remain_page = event['remain_page']
     file = event['file']
+    timeout = event['timeout']
     # os.chdir("/mnt/efs")
 
     page_relations = get_s3_object(bucket, file)
-    try:
-        while current_iter <= end_iter:
-            for page, page_relation in page_relations.items():
-                ranking_result = ranking_each_page(page, page_relation, current_iter, remain_page)
-                print(ranking_result)
-            current_iter += 1
-    except Exception as e:
-        print('error', e)
-    conn.close()
+    while current_iter <= end_iter:
+        conn = sqlite3.connect(db_path, timeout=timeout)
+        cur = conn.cursor()
+        cur.execute('pragma journal_mode=wal')
+        conn.commit()
+        for page, page_relation in page_relations.items():
+            ranking_result = ranking_each_page(page, page_relation, current_iter, remain_page, conn)
+            print(ranking_result)
+        current_iter += 1
+
     return True
