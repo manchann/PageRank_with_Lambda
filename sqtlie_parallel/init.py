@@ -11,7 +11,6 @@ from threading import Thread
 import fcntl
 import sqlite3
 
-
 s3 = boto3.resource('s3')
 s3_client = boto3.client('s3')
 
@@ -93,7 +92,7 @@ total_pages = get_s3_object(bucket, config['relationPrefix'] + 'total_page.txt')
 total_page_length = len(total_pages)
 pagerank_init = 1 / total_page_length
 db_name = 'pagerank.db'
-db_path = './' + db_name
+db_path = '/mnt/efs/ap/' + db_name
 
 conn = sqlite3.connect(db_path)
 cur = conn.cursor()
