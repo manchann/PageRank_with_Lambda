@@ -91,7 +91,7 @@ total_pages = get_s3_object(bucket, config['relationPrefix'] + 'total_page.txt')
 
 total_page_length = len(total_pages)
 pagerank_init = 1 / total_page_length
-db_name = 'pagerank.db'
+db_name = 'test.db'
 db_path = '/mnt/efs/ap/' + db_name
 
 conn = sqlite3.connect(db_path)
