@@ -24,7 +24,7 @@ lambda_client = boto3.client('lambda', region_name='us-west-2', config=lambda_co
 lambda_name = 'jg-sqlite-pagerank'
 bucket = "jg-pagerank-bucket2"
 
-db_name = 'pagerank.db'
+db_name = 'test.db'
 db_path = '/mnt/efs/ap/' + db_name
 
 
