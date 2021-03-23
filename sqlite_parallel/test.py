@@ -67,7 +67,7 @@ def put_efs(data, conn):
     cur.executemany('REPLACE INTO pagerank VALUES (?, ?, ?, ?)',
                     data)
     conn.commit()
-    return rank
+    return True
 
 
 dampen_factor = 0.8
@@ -111,8 +111,8 @@ def put_dynamodb(data):
     for d in data:
         table.put_item(
             Item={
-                'page': str(data[0]),
-                'iter': data[2]
+                'page': str(d[0]),
+                'iter': d[2]
             }
         )
 
