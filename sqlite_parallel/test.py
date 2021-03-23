@@ -62,10 +62,10 @@ def get_past_pagerank(query, conn):
     return ret
 
 
-def put_efs(page, rank, iter, relation_length, conn):
+def put_efs(data, conn):
     cur = conn.cursor()
-    cur.execute('REPLACE INTO pagerank VALUES (?, ?, ?, ?)',
-                (page, iter, rank, relation_length))
+    cur.executemany('REPLACE INTO pagerank VALUES (?, ?, ?, ?)',
+                    data)
     conn.commit()
     return rank
 
@@ -98,25 +98,23 @@ def ranking_each_page(page, page_relation, iter, remain_page, conn):
     rank, get_time = ranking(page_relation, conn)
     page_rank = rank + remain_page
     rank_time = time.time() - rank_start
-    put_start = time.time()
-    put_efs(page, page_rank, iter, len(page_relation), conn)
-    put_time = time.time() - put_start
-    return {'iter': iter,
-            'page': page,
-            'get_time': get_time,
-            'rank_time': rank_time,
-            'put_time': put_time,
-            'page_rank': page_rank,
-            'relation_length': len(page_relation)}
+    # put_start = time.time()
+    # put_efs(page, page_rank, iter, len(page_relation), conn)
+    # put_time = time.time() - put_start
+    return (page,
+            page_rank,
+            iter,
+            len(page_relation))
 
 
 def put_dynamodb(data):
-    table.put_item(
-        Item={
-            'page': str(data['page']),
-            'iter': data['iter']
-        }
-    )
+    for d in data:
+        table.put_item(
+            Item={
+                'page': str(data[0]),
+                'iter': data[2]
+            }
+        )
 
 
 def lambda_handler(current_iter, end_iter, remain_page, file):
@@ -128,10 +126,13 @@ def lambda_handler(current_iter, end_iter, remain_page, file):
             cur.execute('pragma journal_mode=wal')
             cur.execute('pragma busy_timeout=60;')
             conn.commit()
+            ret = []
             for page, page_relation in page_relations.items():
                 ranking_result = ranking_each_page(page, page_relation, current_iter, remain_page, conn)
-                put_dynamodb(ranking_result)
+                ret.append(ranking_result)
                 print(ranking_result)
+            put_efs(ret, conn)
+            put_dynamodb(ret)
             current_iter += 1
             conn.close()
     except Exception as e:
