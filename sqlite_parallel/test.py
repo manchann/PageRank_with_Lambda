@@ -121,10 +121,10 @@ def lambda_handler(current_iter, end_iter, remain_page, file):
     page_relations = get_s3_object(bucket, file)
     try:
         while current_iter <= end_iter:
-            conn = sqlite3.connect(db_path, timeout=120, check_same_thread=False)
+            conn = sqlite3.connect(db_path, timeout=600, check_same_thread=False)
             cur = conn.cursor()
             cur.execute('pragma journal_mode=wal')
-            cur.execute('pragma busy_timeout=120;')
+            cur.execute('pragma busy_timeout=600;')
             conn.commit()
             ret = []
             for page, page_relation in page_relations.items():
@@ -140,6 +140,7 @@ def lambda_handler(current_iter, end_iter, remain_page, file):
 
 config = json.loads(open('driverconfig.json', 'r').read())
 
+start = time.time()
 t_return = []
 for idx in range(10):
     s3_file_path = config['relationPrefix'] + str(idx) + '.txt'
@@ -150,3 +151,4 @@ for idx in range(10):
     t_return.append(t)
 for t in t_return:
     t.join()
+print('걸린 시간: ', time.time() - start)
