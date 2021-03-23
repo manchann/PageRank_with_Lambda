@@ -59,7 +59,6 @@ def invoke_lambda(current_iter, end_iter, remain_page, file):
 def get_past_pagerank(query, conn):
     conn.cursor().execute(query)
     ret = conn.cursor().fetchall()
-    print('get fin')
     return ret
 
 
