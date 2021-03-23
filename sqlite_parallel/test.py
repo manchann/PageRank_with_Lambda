@@ -136,6 +136,7 @@ def lambda_handler(current_iter, end_iter, remain_page, file):
             conn.close()
     except Exception as e:
         print('error: ', e)
+        print(file)
 
 
 config = json.loads(open('driverconfig.json', 'r').read())
