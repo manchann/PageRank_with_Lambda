@@ -65,10 +65,8 @@ def get_past_pagerank(query, conn):
 
 def put_efs(data, conn):
     cur = conn.cursor()
-    print('try executemany')
     cur.executemany('REPLACE INTO pagerank VALUES (?, ?, ?, ?)',
                     data)
-    print('try commit')
     conn.commit()
     return True
 
@@ -133,7 +131,6 @@ def lambda_handler(current_iter, end_iter, remain_page, file):
             for page, page_relation in page_relations.items():
                 ranking_result = ranking_each_page(page, page_relation, current_iter, remain_page, conn)
                 ret.append(ranking_result)
-                print(ranking_result)
             put_efs(ret, conn)
             put_dynamodb(ret)
             current_iter += 1
