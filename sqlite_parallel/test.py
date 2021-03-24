@@ -56,19 +56,25 @@ def invoke_lambda(current_iter, end_iter, remain_page, file):
     return True
 
 
-def get_past_pagerank(query, conn):
+def get_past_pagerank(query, conn, idx):
     conn.cursor().execute(query)
+    start = time.time()
     ret = conn.cursor().fetchall()
+    print(idx + ' get fin ', time.time() - start)
+    print(ret)
     return ret
 
 
-def put_efs(data, conn):
-    print('put start')
+def put_efs(data, conn, idx):
+    start = time.time()
     cur = conn.cursor()
     cur.executemany('REPLACE INTO pagerank VALUES (?, ?, ?, ?)',
                     data)
+    print(idx + ' put execute fin ', time.time() - start)
+    print(data)
+    start = time.time()
     conn.commit()
-    print('put end')
+    print(idx + ' put commit fin ', time.time() - start)
     return True
 
 
@@ -76,7 +82,7 @@ dampen_factor = 0.8
 
 
 # 랭크를 계산합니다.
-def ranking(page_relation, conn):
+def ranking(page_relation, conn, idx):
     rank = 0
     page_query = 'SELECT * FROM pagerank Where '
     for page in page_relation:
@@ -84,7 +90,7 @@ def ranking(page_relation, conn):
         page_query += 'page=' + page + ' OR '
     page_query = page_query[:len(page_query) - 3]
     get_start = time.time()
-    past_pagerank = get_past_pagerank(page_query, conn)
+    past_pagerank = get_past_pagerank(page_query, conn, idx)
     get_time = time.time() - get_start
     for page_data in past_pagerank:
         past_rank = page_data[2]
@@ -95,9 +101,9 @@ def ranking(page_relation, conn):
 
 
 # 각각 페이지에 대하여 rank를 계산하고 dynamodb에 업데이트 합니다.
-def ranking_each_page(page, page_relation, iter, remain_page, conn):
+def ranking_each_page(page, page_relation, iter, remain_page, conn, idx):
     rank_start = time.time()
-    rank, get_time = ranking(page_relation, conn)
+    rank, get_time = ranking(page_relation, conn, idx)
     page_rank = rank + remain_page
     rank_time = time.time() - rank_start
     # put_start = time.time()
@@ -119,7 +125,7 @@ def put_dynamodb(data):
         )
 
 
-def lambda_handler(current_iter, end_iter, remain_page, file):
+def lambda_handler(current_iter, end_iter, remain_page, file, idx):
     page_relations = get_s3_object(bucket, file)
     try:
         while current_iter <= end_iter:
@@ -130,9 +136,9 @@ def lambda_handler(current_iter, end_iter, remain_page, file):
             conn.commit()
             ret = []
             for page, page_relation in page_relations.items():
-                ranking_result = ranking_each_page(page, page_relation, current_iter, remain_page, conn)
+                ranking_result = ranking_each_page(page, page_relation, current_iter, remain_page, conn, idx)
                 ret.append(ranking_result)
-            put_efs(ret, conn)
+            put_efs(ret, conn, idx)
             put_dynamodb(ret)
             current_iter += 1
             conn.close()
@@ -145,11 +151,11 @@ config = json.loads(open('driverconfig.json', 'r').read())
 
 start = time.time()
 t_return = []
-for idx in range(10):
+for idx in range(2):
     s3_file_path = config['relationPrefix'] + str(idx) + '.txt'
     print(idx, '번째 invoking')
     t = Thread(target=lambda_handler,
-               args=(1, 3, 1, s3_file_path,))
+               args=(1, 3, 1, s3_file_path, str(idx)))
     t.start()
     t_return.append(t)
 for t in t_return:
