@@ -59,6 +59,7 @@ def invoke_lambda(current_iter, end_iter, remain_page, file):
 def get_past_pagerank(query, conn, idx):
     conn.cursor().execute(query)
     start = time.time()
+    print('get start')
     ret = conn.cursor().fetchall()
     print(idx + ' get fin ', time.time() - start)
     print(ret)
@@ -67,6 +68,7 @@ def get_past_pagerank(query, conn, idx):
 
 def put_efs(data, conn, idx):
     start = time.time()
+    print(idx + ' put start ', time.time() - start)
     cur = conn.cursor()
     cur.executemany('REPLACE INTO pagerank VALUES (?, ?, ?, ?)',
                     data)
