@@ -129,7 +129,7 @@ def lambda_handler(current_iter, end_iter, remain_page, file, idx):
         while current_iter <= end_iter:
             conn = sqlite3.connect(db_path, timeout=600, check_same_thread=False)
             cur = conn.cursor()
-            cur.execute('pragma journal_mode=wal')
+            # cur.execute('pragma journal_mode=wal')
             cur.execute('pragma busy_timeout=600;')
             conn.commit()
             ret = []
