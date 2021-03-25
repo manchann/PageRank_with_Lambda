@@ -151,7 +151,7 @@ config = json.loads(open('driverconfig.json', 'r').read())
 
 start = time.time()
 t_return = []
-for idx in range(2):
+for idx in range(3):
     s3_file_path = config['relationPrefix'] + str(idx) + '.txt'
     print(idx, '번째 invoking')
     t = Thread(target=lambda_handler,
