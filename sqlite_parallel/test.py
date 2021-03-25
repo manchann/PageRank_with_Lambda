@@ -58,15 +58,14 @@ def invoke_lambda(current_iter, end_iter, remain_page, file):
 
 def get_past_pagerank(query, conn, idx):
     conn.cursor().execute(query)
-    print(idx + ' get start ', time.time())
+    print(idx + ' get try ', time.time())
     ret = conn.cursor().fetchall()
     print(idx + ' get fin ', time.time())
     return ret
 
 
 def put_efs(data, conn, idx):
-    start = time.time()
-    print(idx + ' put start ', time.time())
+    print(idx + ' put try ', time.time())
     cur = conn.cursor()
     cur.executemany('REPLACE INTO pagerank VALUES (?, ?, ?, ?)',
                     data)
@@ -149,7 +148,7 @@ config = json.loads(open('driverconfig.json', 'r').read())
 
 start = time.time()
 t_return = []
-for idx in range(2):
+for idx in range(4):
     s3_file_path = config['relationPrefix'] + str(idx) + '.txt'
     print(idx, '번째 invoking')
     t = Thread(target=lambda_handler,
