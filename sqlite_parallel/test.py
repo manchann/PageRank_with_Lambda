@@ -157,7 +157,7 @@ for idx in range(2):
     s3_file_path = config['relationPrefix'] + str(idx) + '.txt'
     print(idx, '번째 invoking', time.time() - start_th)
     t = Thread(target=lambda_handler,
-               args=(1, 3, 1, s3_file_path, str(idx)))
+               args=(1, 2, 1, s3_file_path, str(idx)))
     t.start()
     t_return.append(t)
 for t in t_return:
