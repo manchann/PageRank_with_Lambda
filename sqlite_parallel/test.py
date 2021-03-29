@@ -158,8 +158,10 @@ for idx in range(2):
     print(idx, '번째 invoking', time.time() - start_th)
     t = Thread(target=lambda_handler,
                args=(1, 3, 1, s3_file_path, str(idx)))
+    st = time.time()
     t.start()
     t_return.append(t)
+    print('test: ', time.time() - st)
 for t in t_return:
     t.join()
 print('걸린 시간: ', time.time() - start)
