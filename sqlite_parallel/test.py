@@ -61,7 +61,7 @@ def get_past_pagerank(query, conn, idx):
     start = time.time()
     print(idx + ' get try ', start)
     ret = conn.cursor().fetchall()
-    print(idx + ' get fin ', time.time() - start)
+    print(idx + ' get fin ', time.time(), time.time() - start)
     return ret
 
 
