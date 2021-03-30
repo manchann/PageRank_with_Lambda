@@ -144,7 +144,7 @@ def lambda_handler(current_iter, end_iter, remain_page, file, idx):
     page_relations = get_s3_object(bucket, file)
     print('s3 get 걸린 시간', time.time() - start)
     print(idx, ' connect try')
-    conn = sqlite3.connect(db_path, timeout=600, check_same_thread=False)
+    # conn = sqlite3.connect(db_path, timeout=600, check_same_thread=False)
     print(idx, 'connect success')
     reader_arr = []
     for idx in range(total_divide_num + 1):
@@ -156,13 +156,16 @@ def lambda_handler(current_iter, end_iter, remain_page, file, idx):
         except:
             pass
     try:
+        db_name = file.split('/')[2]
+        db_name = int(db_name.split('.')[0])
+        writer = reader_arr[db_name]
         while current_iter <= end_iter:
             print(str(idx) + ' ' + str(current_iter) + '번째 iteration')
             ret = []
             for page, page_relation in page_relations.items():
                 ranking_result = ranking_each_page(page, page_relation, current_iter, remain_page, reader_arr, idx)
                 ret.append(ranking_result)
-            put_efs(ret, conn, idx)
+            put_efs(ret, writer, idx)
             current_iter += 1
     except Exception as e:
         print(str(idx) + ' error: ', e)
