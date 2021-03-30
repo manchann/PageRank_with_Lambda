@@ -56,13 +56,19 @@ def invoke_lambda(current_iter, end_iter, remain_page, file):
     return True
 
 
-def get_past_pagerank(query, conn, idx):
-    start = time.time()
-    print(idx + ' get try', start)
-    conn.cursor().execute(query)
-    print(idx + ' fetchall try ', time.time(), time.time() - start)
-    ret = conn.cursor().fetchall()
-    print(idx + ' get fetchall fin ', time.time(), time.time() - start)
+def get_past_pagerank(get_query_arr, reader_arr, idx):
+    ret = []
+    for idx in range(len(get_query_arr)):
+        if get_query_arr[idx] == '0':
+            continue
+        get_query_arr[idx] = get_query_arr[idx][:len(get_query_arr[idx]) - 4] + ';'
+        reader = reader_arr[idx]
+        cur = reader.cursor()
+        print(cur)
+        cur.execute(get_query_arr[idx])
+        res = cur.fetchall()
+        ret += res
+        print(ret)
     return ret
 
 
@@ -84,14 +90,19 @@ dampen_factor = 0.8
 # 랭크를 계산합니다.
 def ranking(page_relation, conn, idx):
     rank = 0
+
+    get_query_arr = ['0' for i in range(total_divide_num + 1)]
     page_query = 'SELECT * FROM pagerank Where '
     for page in page_relation:
         # dynamodb에 올려져 있는 해당 페이지의 rank를 가져옵니다.
-        page_query += 'page=' + page + ' OR '
-    page_query = page_query[:len(page_query) - 3]
+        db_num = int(page) // 1000
+        if get_query_arr[db_num] == '0':
+            get_query_arr[db_num] = page_query
+        get_query_arr[db_num] += 'page=' + page + ' OR '
     get_start = time.time()
-    past_pagerank = get_past_pagerank(page_query, conn, idx)
+    past_pagerank = get_past_pagerank(get_query_arr, conn, idx)
     get_time = time.time() - get_start
+
     for page_data in past_pagerank:
         past_rank = page_data[2]
         relation_length = page_data[3]
@@ -125,6 +136,9 @@ def put_dynamodb(data):
         )
 
 
+total_divide_num = 4840
+
+
 def lambda_handler(current_iter, end_iter, remain_page, file, idx):
     start = time.time()
     page_relations = get_s3_object(bucket, file)
@@ -132,16 +146,23 @@ def lambda_handler(current_iter, end_iter, remain_page, file, idx):
     print(idx, ' connect try')
     conn = sqlite3.connect(db_path, timeout=600, check_same_thread=False)
     print(idx, 'connect success')
+    reader_arr = []
+    for idx in range(total_divide_num + 1):
+        try:
+            read_db = db_path + str(idx) + '.db'
+            reader = sqlite3.connect(read_db, timeout=600)
+
+            reader_arr.append(reader)
+        except:
+            pass
     try:
         while current_iter <= end_iter:
             print(str(idx) + ' ' + str(current_iter) + '번째 iteration')
             ret = []
             for page, page_relation in page_relations.items():
-                ranking_result = ranking_each_page(page, page_relation, current_iter, remain_page, conn, idx)
+                ranking_result = ranking_each_page(page, page_relation, current_iter, remain_page, reader_arr, idx)
                 ret.append(ranking_result)
-            if str(idx) == '0':
-                put_efs(ret, conn, idx)
-                # put_dynamodb(ret)
+            put_efs(ret, conn, idx)
             current_iter += 1
     except Exception as e:
         print(str(idx) + ' error: ', e)

@@ -26,7 +26,6 @@ total_divide_num = 4840
 
 db_path = '/mnt/efs/'
 
-
 # 주어진 bucket 위치 경로에 파일 이름이 key인 object와 data를 저장합니다.
 def write_to_s3(bucket, key):
     s3.Bucket(bucket).put_object(Key=key)
@@ -63,6 +62,7 @@ def get_past_pagerank(get_query_arr, reader_arr):
         get_query_arr[idx] = get_query_arr[idx][:len(get_query_arr[idx]) - 4] + ';'
         reader = reader_arr[idx]
         cur = reader.cursor()
+        print(cur)
         cur.execute(get_query_arr[idx])
         res = cur.fetchall()
         ret += res
