@@ -130,11 +130,12 @@ def lambda_handler(current_iter, end_iter, remain_page, file, idx):
     print('s3 get 걸린 시간', time.time() - start)
     conn = sqlite3.connect(db_path, timeout=600, check_same_thread=False)
     cur = conn.cursor()
+    cur.execute('pragma journal_mode=wal')
+    cur.execute('pragma busy_timeout=600;')
+    conn.commit()
     try:
         while current_iter <= end_iter:
-            cur.execute('pragma journal_mode=wal')
-            cur.execute('pragma busy_timeout=600;')
-            conn.commit()
+
             ret = []
             for page, page_relation in page_relations.items():
                 ranking_result = ranking_each_page(page, page_relation, current_iter, remain_page, conn, idx)
