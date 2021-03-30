@@ -55,22 +55,17 @@ def invoke_lambda(current_iter, end_iter, remain_page, file):
 
 
 def get_past_pagerank(query, conn):
-    print('get try')
     conn.cursor().execute(query)
     ret = conn.cursor().fetchall()
-    print('get end')
     return ret
 
 
-def put_efs(page, rank, iter, relation_length, conn):
-    print('put try')
-    cur = conn.cursor()
-    cur.execute('REPLACE INTO pagerank VALUES (?, ?, ?, ?)',
-                (page, iter, rank, relation_length))
-    print('put commit try')
-    conn.commit()
-    print('put end')
-    return rank
+def put_efs(data, writer):
+    cur = writer.cursor()
+    cur.executemany('REPLACE INTO pagerank VALUES (?, ?, ?, ?)',
+                    data)
+    writer.commit()
+    return True
 
 
 dampen_factor = 0.8
@@ -79,14 +74,17 @@ dampen_factor = 0.8
 # 랭크를 계산합니다.
 def ranking(page_relation, conn):
     rank = 0
+
     page_query = 'SELECT * FROM pagerank Where '
     for page in page_relation:
         # dynamodb에 올려져 있는 해당 페이지의 rank를 가져옵니다.
         page_query += 'page=' + page + ' OR '
     page_query = page_query[:len(page_query) - 3]
+
     get_start = time.time()
     past_pagerank = get_past_pagerank(page_query, conn)
     get_time = time.time() - get_start
+
     for page_data in past_pagerank:
         past_rank = page_data[2]
         relation_length = page_data[3]
@@ -96,22 +94,20 @@ def ranking(page_relation, conn):
 
 
 # 각각 페이지에 대하여 rank를 계산하고 dynamodb에 업데이트 합니다.
-def ranking_each_page(page, page_relation, iter, remain_page, conn):
+def ranking_each_page(page, page_relation, iter, remain_page, writer):
     rank_start = time.time()
-    rank, get_time = ranking(page_relation, conn)
+    rank, get_time = ranking(page_relation, writer)
     page_rank = rank + remain_page
     rank_time = time.time() - rank_start
-    put_start = time.time()
-    put_efs(page, page_rank, iter, len(page_relation), conn)
-    put_time = time.time() - put_start
+
     return {'iter': iter,
             'page': page,
             'get_time': get_time,
             'rank_time': rank_time,
-            'put_time': put_time,
             'page_rank': page_rank,
             'relation_length': len(page_relation)}
 
+for idx in range(48)
 
 def lambda_handler(event, context):
     current_iter = event['current_iter']
@@ -121,7 +117,17 @@ def lambda_handler(event, context):
     writer = sqlite3.connect(db_path, timeout=600, check_same_thread=False)
     page_relations = get_s3_object(bucket, file)
     while current_iter <= end_iter:
+        ret = []
         for page, page_relation in page_relations.items():
             ranking_result = ranking_each_page(page, page_relation, current_iter, remain_page, writer)
+            result = (ranking_result['page'], ranking_result['page_rank'], ranking_result['iter'],
+                      ranking_result['relation_length'])
+            ret.append(result)
             print(ranking_result)
+        put_start = time.time()
+        put_efs(ret, writer)
+        put_time = time.time() - put_start
+        print(put_time)
         current_iter += 1
+
+    return True

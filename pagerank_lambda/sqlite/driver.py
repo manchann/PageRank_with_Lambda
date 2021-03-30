@@ -119,6 +119,12 @@ for page in total_pages:
     db = db_path + str(db_num) + '.db'
     conn = sqlite3.connect(db)
     cur = conn.cursor()
+    cur.execute('''CREATE TABLE if not exists pagerank(
+                            page INTEGER NOT NULL PRIMARY KEY,
+                            iter integer ,
+                            rank real,
+                            relation_length integer
+                         )''')
     cur.execute('INSERT OR REPLACE INTO pagerank VALUES (?,?,?,?)',
                 (page, 0, pagerank_init, len(page_relation)))
     print(page, ' 페이지 진행 중')
