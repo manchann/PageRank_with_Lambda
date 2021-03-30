@@ -115,7 +115,7 @@ for page in total_pages:
         page_relation = page_relations[page]
     except:
         page_relation = ['-1']
-    db_num = int(page) / divided_page_num
+    db_num = int(page) // divided_page_num
     db = db_path + str(db_num) + '.db'
     print(db)
     conn = sqlite3.connect(db)
