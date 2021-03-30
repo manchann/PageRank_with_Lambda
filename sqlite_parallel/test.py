@@ -142,7 +142,7 @@ def lambda_handler(current_iter, end_iter, remain_page, file, idx):
             if str(idx) == '0':
                 put_efs(ret, conn, idx)
                 # put_dynamodb(ret)
-            current_iter +=
+            current_iter += 1
     except Exception as e:
         print(str(idx) + ' error: ', e)
         print(file)
