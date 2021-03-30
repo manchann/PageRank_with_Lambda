@@ -128,9 +128,10 @@ def lambda_handler(current_iter, end_iter, remain_page, file, idx):
     start = time.time()
     page_relations = get_s3_object(bucket, file)
     print('s3 get 걸린 시간', time.time() - start)
+    print(idx, ' connect try')
     conn = sqlite3.connect(db_path, timeout=600, check_same_thread=False)
+    print(idx, 'connect success')
     cur = conn.cursor()
-    cur.execute('pragma journal_mode=wal')
     cur.execute('pragma busy_timeout=600;')
     conn.commit()
     try:
