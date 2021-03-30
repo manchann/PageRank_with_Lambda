@@ -121,8 +121,8 @@ def ranking_each_page(page, page_relation, iter, remain_page, conn, idx):
     # put_efs(page, page_rank, iter, len(page_relation), conn)
     # put_time = time.time() - put_start
     return (page,
-            page_rank,
             iter,
+            page_rank,
             len(page_relation))
 
 

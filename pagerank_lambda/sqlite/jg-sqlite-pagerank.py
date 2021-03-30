@@ -26,6 +26,7 @@ total_divide_num = 4840
 
 db_path = '/mnt/efs/'
 
+
 # 주어진 bucket 위치 경로에 파일 이름이 key인 object와 data를 저장합니다.
 def write_to_s3(bucket, key):
     s3.Bucket(bucket).put_object(Key=key)
@@ -60,23 +61,17 @@ def get_past_pagerank(get_query_arr, reader_arr):
         if get_query_arr[idx] == '0':
             continue
         get_query_arr[idx] = get_query_arr[idx][:len(get_query_arr[idx]) - 4] + ';'
-        reader = reader_arr[idx]
+        reader = sqlite3.connect(db_path + str(idx) + '.db')
         cur = reader.cursor()
-        print(cur)
         cur.execute(get_query_arr[idx])
         res = cur.fetchall()
         ret += res
-        print(ret)
     return ret
 
 
 def put_efs(data, writer):
     cur = writer.cursor()
-    cur.execute('select * from pagerank;')
-    print(cur.fetchall())
     cur.executemany('REPLACE INTO pagerank VALUES (?, ?, ?, ?);', data)
-    print(data)
-    print(cur.fetchall())
     writer.commit()
     return True
 
@@ -135,18 +130,23 @@ def lambda_handler(event, context):
         try:
             read_db = db_path + str(idx) + '.db'
             reader = sqlite3.connect(read_db, timeout=600)
-
+            reader.cursor().execute('''CREATE TABLE if not exists pagerank(
+                                                page INTEGER NOT NULL PRIMARY KEY,
+                                                iter integer ,
+                                                rank real,
+                                                relation_length integer
+                                             )''')
             reader_arr.append(reader)
         except:
             pass
     db_name = file.split('/')[2]
     db_name = int(db_name.split('.')[0])
-    writer = reader_arr[db_name]
+    writer = sqlite3.connect(db_path + str(db_name) + '.db')
     while current_iter <= end_iter:
         ret = []
         for page, page_relation in page_relations.items():
             ranking_result = ranking_each_page(page, page_relation, current_iter, remain_page, reader_arr)
-            result = (ranking_result['page'], ranking_result['page_rank'], ranking_result['iter'],
+            result = (ranking_result['page'], ranking_result['iter'], ranking_result['page_rank'],
                       ranking_result['relation_length'])
             ret.append(result)
             print(ranking_result)
