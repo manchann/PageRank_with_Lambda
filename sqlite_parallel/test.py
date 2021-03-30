@@ -131,9 +131,6 @@ def lambda_handler(current_iter, end_iter, remain_page, file, idx):
     print(idx, ' connect try')
     conn = sqlite3.connect(db_path, timeout=600, check_same_thread=False)
     print(idx, 'connect success')
-    cur = conn.cursor()
-    cur.execute('pragma busy_timeout=600;')
-    conn.commit()
     try:
         while current_iter <= end_iter:
 
