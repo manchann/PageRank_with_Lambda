@@ -151,7 +151,12 @@ def lambda_handler(current_iter, end_iter, remain_page, file, idx):
         try:
             read_db = db_path + str(i) + '.db'
             reader = sqlite3.connect(read_db, timeout=600)
-
+            reader.cursor().execute('''CREATE TABLE if not exists pagerank(
+                                    page INTEGER NOT NULL PRIMARY KEY,
+                                    iter integer ,
+                                    rank real,
+                                    relation_length integer
+                                 )''')
             reader_arr.append(reader)
         except:
             pass
