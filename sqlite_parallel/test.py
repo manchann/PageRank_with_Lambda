@@ -147,9 +147,9 @@ def lambda_handler(current_iter, end_iter, remain_page, file, idx):
     # conn = sqlite3.connect(db_path, timeout=600, check_same_thread=False)
     print(idx, 'connect success')
     reader_arr = []
-    for idx in range(total_divide_num + 1):
+    for i in range(total_divide_num + 1):
         try:
-            read_db = db_path + str(idx) + '.db'
+            read_db = db_path + str(i) + '.db'
             reader = sqlite3.connect(read_db, timeout=600)
 
             reader_arr.append(reader)
