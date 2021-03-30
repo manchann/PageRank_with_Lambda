@@ -76,7 +76,7 @@ def put_efs(data, conn, idx):
     start = time.time()
     print(idx + ' put try ', start)
     cur = conn.cursor()
-    cur.executemany('REPLACE INTO `pagerank` VALUES (?, ?, ?, ?)',
+    cur.executemany("REPLACE INTO 'pagerank' VALUES (?, ?, ?, ?)",
                     data)
     print(idx + ' put execute fin ', time.time(), time.time() - start)
     conn.commit()
@@ -92,7 +92,7 @@ def ranking(page_relation, conn, idx):
     rank = 0
 
     get_query_arr = ['0' for i in range(total_divide_num + 1)]
-    page_query = 'SELECT * FROM `pagerank` Where '
+    page_query = "SELECT * FROM 'pagerank' Where "
     for page in page_relation:
         # dynamodb에 올려져 있는 해당 페이지의 rank를 가져옵니다.
         db_num = int(page) // 1000
