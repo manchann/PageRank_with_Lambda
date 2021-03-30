@@ -134,7 +134,7 @@ def lambda_handler(current_iter, end_iter, remain_page, file, idx):
     print(idx, 'connect success')
     try:
         while current_iter <= end_iter:
-            print(idx + ' ' + current_iter + '번째 iteration')
+            print(str(idx) + ' ' + current_iter + '번째 iteration')
             ret = []
             for page, page_relation in page_relations.items():
                 ranking_result = ranking_each_page(page, page_relation, current_iter, remain_page, conn, idx)
@@ -143,7 +143,7 @@ def lambda_handler(current_iter, end_iter, remain_page, file, idx):
             # put_dynamodb(ret)
             current_iter += 1
     except Exception as e:
-        print(idx + ' error: ', e)
+        print(str(idx) + ' error: ', e)
         print(file)
 
 
