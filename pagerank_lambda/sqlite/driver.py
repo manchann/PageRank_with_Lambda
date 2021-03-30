@@ -94,12 +94,14 @@ for i in range(invoked_lambda_num + 1):
         db = db_path + str(i) + '.db'
         conn = sqlite3.connect(db)
         cur = conn.cursor()
-        cur.execute('''CREATE TABLE pagerank(
+        cur.execute('''CREATE TABLE if not exists pagerank(
                         page INTEGER NOT NULL PRIMARY KEY,
                         iter integer ,
                         rank real,
                         relation_length integer
                      )''')
+        subprocess.call(['sudo', 'chmod', '644', db])
+        subprocess.call(['sudo', 'chown', '1001:1001', db])
         page_relations.update(get_s3_object(bucket, config['relationPrefix'] + str(i) + '.txt'))
     except:
         pass
