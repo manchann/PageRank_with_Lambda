@@ -144,7 +144,7 @@ def lambda_handler(current_iter, end_iter, remain_page, file, idx):
             current_iter += 1
             conn.close()
     except Exception as e:
-        print('error: ', e)
+        print(idx + ' error: ', e)
         print(file)
 
 
