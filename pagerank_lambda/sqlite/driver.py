@@ -88,23 +88,23 @@ divided_page_num = config["divided_page_num"]
 invoked_lambda_num = config["invoked_lambda_num"]
 # 전체 페이지의 개수를 계산합니다.
 db_path = '/mnt/efs/ap/'
-for i in range(invoked_lambda_num + 1):
-    print(i)
-    try:
-        db = db_path + str(i) + '.db'
-        conn = sqlite3.connect(db)
-        cur = conn.cursor()
-        cur.execute('''CREATE TABLE if not exists pagerank(
-                        page INTEGER NOT NULL PRIMARY KEY,
-                        iter integer ,
-                        rank real,
-                        relation_length integer
-                     )''')
-        subprocess.call(['sudo', 'chmod', '644', db])
-        subprocess.call(['sudo', 'chown', '1001:1001', db])
-        page_relations.update(get_s3_object(bucket, config['relationPrefix'] + str(i) + '.txt'))
-    except:
-        pass
+# for i in range(invoked_lambda_num + 1):
+#     print(i)
+#     try:
+#         db = db_path + str(i) + '.db'
+#         conn = sqlite3.connect(db)
+#         cur = conn.cursor()
+#         cur.execute('''CREATE TABLE if not exists pagerank(
+#                         page INTEGER NOT NULL PRIMARY KEY,
+#                         iter integer ,
+#                         rank real,
+#                         relation_length integer
+#                      )''')
+#         subprocess.call(['sudo', 'chmod', '644', db])
+#         subprocess.call(['sudo', 'chown', '1001:1001', db])
+#         page_relations.update(get_s3_object(bucket, config['relationPrefix'] + str(i) + '.txt'))
+#     except:
+#         pass
 total_pages = get_s3_object(bucket, config['relationPrefix'] + 'total_page.txt')
 
 total_page_length = len(total_pages)
@@ -138,16 +138,16 @@ print('pages 총 개수:', total_page_length)
 print('pages 분할 개수:', divided_page_num)
 
 # S3의 나뉘어진 파일 수 만큼 람다를 병렬적으로 Invoke합니다.
-t_return = []
-for idx in range(10):
-    s3_file_path = config['relationPrefix'] + str(idx) + '.txt'
-    print(idx, '번째 invoking')
-    t = Thread(target=invoke_lambda,
-               args=(1, end_iter, remain_page, s3_file_path, pagerank_init))
-    t.start()
-    t_return.append(t)
-for t in t_return:
-    t.join()
+# t_return = []
+# for idx in range(10):
+#     s3_file_path = config['relationPrefix'] + str(idx) + '.txt'
+#     print(idx, '번째 invoking')
+#     t = Thread(target=invoke_lambda,
+#                args=(1, end_iter, remain_page, s3_file_path, pagerank_init))
+#     t.start()
+#     t_return.append(t)
+# for t in t_return:
+#     t.join()
 #
 # for idx in range(invoked_lambda_num + 1):
 #     try:

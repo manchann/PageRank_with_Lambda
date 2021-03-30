@@ -118,17 +118,10 @@ def lambda_handler(event, context):
     end_iter = event['end_iter']
     remain_page = event['remain_page']
     file = event['file']
-    # os.chdir("/mnt/efs")
-
+    writer = sqlite3.connect(db_path, timeout=600, check_same_thread=False)
     page_relations = get_s3_object(bucket, file)
     while current_iter <= end_iter:
-        conn = sqlite3.connect(db_path, timeout=30000000, check_same_thread=False)
-        cur = conn.cursor()
-        cur.execute('pragma journal_mode=wal')
-        cur.execute('pragma busy_timeout=10000000;')
-        conn.commit()
         for page, page_relation in page_relations.items():
-            ranking_result = ranking_each_page(page, page_relation, current_iter, remain_page, conn)
+            ranking_result = ranking_each_page(page, page_relation, current_iter, remain_page, writer)
             print(ranking_result)
         current_iter += 1
-        conn.close()
