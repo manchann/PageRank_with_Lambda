@@ -139,8 +139,9 @@ def lambda_handler(current_iter, end_iter, remain_page, file, idx):
             for page, page_relation in page_relations.items():
                 ranking_result = ranking_each_page(page, page_relation, current_iter, remain_page, conn, idx)
                 ret.append(ranking_result)
-            put_efs(ret, conn, idx)
-            # put_dynamodb(ret)
+            if idx == 0:
+                put_efs(ret, conn, idx)
+                # put_dynamodb(ret)
             current_iter += 1
     except Exception as e:
         print(str(idx) + ' error: ', e)
