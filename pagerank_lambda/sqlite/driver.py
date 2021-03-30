@@ -117,6 +117,7 @@ for page in total_pages:
         page_relation = ['-1']
     db_num = int(page) / divided_page_num
     db = db_path + str(db_num) + '.db'
+    print(db)
     conn = sqlite3.connect(db)
     cur = conn.cursor()
     cur.execute('INSERT OR REPLACE INTO pagerank VALUES (?,?,?,?)',
