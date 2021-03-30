@@ -24,7 +24,7 @@ bucket = "jg-pagerank-bucket2"
 
 total_divide_num = 4840
 
-db_path = '/mnt/efs/'
+db_path = "/mnt/efs/"
 
 
 # 주어진 bucket 위치 경로에 파일 이름이 key인 object와 data를 저장합니다.
@@ -61,7 +61,7 @@ def get_past_pagerank(get_query_arr, reader_arr):
         if get_query_arr[idx] == '0':
             continue
         get_query_arr[idx] = get_query_arr[idx][:len(get_query_arr[idx]) - 4] + ';'
-        reader = sqlite3.connect(db_path + str(idx) + '.db')
+        reader = sqlite3.connect(db_path + str(idx) + ".db")
         cur = reader.cursor()
         cur.execute(get_query_arr[idx])
         res = cur.fetchall()
@@ -84,13 +84,13 @@ def ranking(page_relation, reader_arr):
     rank = 0
 
     get_query_arr = ['0' for i in range(total_divide_num + 1)]
-    page_query = 'SELECT * FROM pagerank Where '
+    page_query = "SELECT * FROM pagerank Where "
     for page in page_relation:
         # dynamodb에 올려져 있는 해당 페이지의 rank를 가져옵니다.
         db_num = int(page) // 1000
         if get_query_arr[db_num] == '0':
             get_query_arr[db_num] = page_query
-        get_query_arr[db_num] += 'page=' + page + ' OR '
+        get_query_arr[db_num] += "page=" + page + " OR "
     get_start = time.time()
     past_pagerank = get_past_pagerank(get_query_arr, reader_arr)
     get_time = time.time() - get_start
@@ -130,18 +130,12 @@ def lambda_handler(event, context):
         try:
             read_db = db_path + str(idx) + '.db'
             reader = sqlite3.connect(read_db, timeout=600)
-            reader.cursor().execute('''CREATE TABLE if not exists pagerank(
-                                                page INTEGER NOT NULL PRIMARY KEY,
-                                                iter integer ,
-                                                rank real,
-                                                relation_length integer
-                                             )''')
             reader_arr.append(reader)
         except:
             pass
     db_name = file.split('/')[2]
     db_name = int(db_name.split('.')[0])
-    writer = sqlite3.connect(db_path + str(db_name) + '.db')
+    writer = reader_arr[db_name]
     while current_iter <= end_iter:
         ret = []
         for page, page_relation in page_relations.items():

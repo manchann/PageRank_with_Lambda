@@ -24,8 +24,7 @@ lambda_client = boto3.client('lambda', region_name='us-west-2', config=lambda_co
 lambda_name = 'jg-sqlite-pagerank'
 bucket = "jg-pagerank-bucket2"
 
-db_name = 'test.db'
-db_path = '/mnt/efs/ap/' + db_name
+db_path = '/mnt/efs/ap/'
 
 
 # 주어진 bucket 위치 경로에 파일 이름이 key인 object와 data를 저장합니다.
