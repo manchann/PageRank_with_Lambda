@@ -88,23 +88,23 @@ divided_page_num = config["divided_page_num"]
 invoked_lambda_num = config["invoked_lambda_num"]
 # 전체 페이지의 개수를 계산합니다.
 db_path = '/mnt/efs/ap/'
-# for i in range(invoked_lambda_num + 1):
-#     print(i)
-#     try:
-#         db = db_path + str(i) + '.db'
-#         conn = sqlite3.connect(db)
-#         cur = conn.cursor()
-#         cur.execute('''CREATE TABLE if not exists pagerank(
-#                         page INTEGER NOT NULL PRIMARY KEY,
-#                         iter integer ,
-#                         rank real,
-#                         relation_length integer
-#                      )''')
-#         subprocess.call(['sudo', 'chmod', '644', db])
-#         subprocess.call(['sudo', 'chown', '1001:1001', db])
-#         page_relations.update(get_s3_object(bucket, config['relationPrefix'] + str(i) + '.txt'))
-#     except:
-#         pass
+for i in range(invoked_lambda_num + 1):
+    print(i)
+    try:
+        db = db_path + str(i) + '.db'
+        conn = sqlite3.connect(db)
+        cur = conn.cursor()
+        cur.execute('''CREATE TABLE if not exists pagerank(
+                        page INTEGER NOT NULL PRIMARY KEY,
+                        iter integer ,
+                        rank real,
+                        relation_length integer
+                     )''')
+        subprocess.call(['sudo', 'chmod', '644', db])
+        subprocess.call(['sudo', 'chown', '1001:1001', db])
+        page_relations.update(get_s3_object(bucket, config['relationPrefix'] + str(i) + '.txt'))
+    except:
+        pass
 total_pages = get_s3_object(bucket, config['relationPrefix'] + 'total_page.txt')
 
 total_page_length = len(total_pages)
