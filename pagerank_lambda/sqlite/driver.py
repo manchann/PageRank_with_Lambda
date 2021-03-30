@@ -90,15 +90,6 @@ invoked_lambda_num = config["invoked_lambda_num"]
 for i in range(invoked_lambda_num + 1):
     print(i)
     try:
-        db_path = '/mnt/efs/ap/' + str(i) + '.db'
-        conn = sqlite3.connect(db_path)
-        cur = conn.cursor()
-        cur.execute('''CREATE TABLE pagerank(
-                        page INTEGER NOT NULL PRIMARY KEY,
-                        iter integer ,
-                        rank real,
-                        relation_length integer
-                     )''')
         page_relations.update(get_s3_object(bucket, config['relationPrefix'] + str(i) + '.txt'))
     except:
         pass
@@ -112,15 +103,15 @@ db_path = '/mnt/efs/ap/' + db_name
 conn = sqlite3.connect(db_path)
 cur = conn.cursor()
 
-# for page in total_pages:
-#     try:
-#         page_relation = page_relations[page]
-#     except:
-#         page_relation = ['-1']
-#     cur.execute('INSERT OR REPLACE INTO pagerank VALUES (?,?,?,?)',
-#                 (page, 0, pagerank_init, len(page_relation)))
-#     print(page, ' 페이지 진행 중')
-#     conn.commit()
+for page in total_pages:
+    try:
+        page_relation = page_relations[page]
+    except:
+        page_relation = ['-1']
+    cur.execute('INSERT OR REPLACE INTO pagerank VALUES (?,?,?,?)',
+                (page, 0, pagerank_init, len(page_relation)))
+    print(page, ' 페이지 진행 중')
+    conn.commit()
 
 print('init 끝')
 # 모든 page의 초기 Rank값은 1/(전체 페이지 수) 의 값을 가집니다.
