@@ -61,7 +61,7 @@ def get_past_pagerank(get_query_arr, reader_arr):
         if get_query_arr[idx] == '0':
             continue
         get_query_arr[idx] = get_query_arr[idx][:len(get_query_arr[idx]) - 4] + ';'
-        reader = sqlite3.connect(db_path + str(idx) + ".db")
+        reader = sqlite3.connect(db_path + str(idx) + '.db')
         cur = reader.cursor()
         cur.execute(get_query_arr[idx])
         res = cur.fetchall()
@@ -126,16 +126,18 @@ def lambda_handler(event, context):
     page_relations = get_s3_object(bucket, file)
 
     reader_arr = []
-    for idx in range(total_divide_num + 1):
-        try:
-            read_db = db_path + str(idx) + '.db'
-            reader = sqlite3.connect(read_db, timeout=600)
-            reader_arr.append(reader)
-        except:
-            pass
+    # for idx in range(total_divide_num + 1):
+    #     try:
+    #         read_db = db_path + str(idx) + '.db'
+    #         reader = sqlite3.connect(read_db, timeout=600)
+    #         reader_arr.append(reader)
+    #     except:
+    #         pass
     db_name = file.split('/')[2]
     db_name = int(db_name.split('.')[0])
-    writer = reader_arr[db_name]
+    # writer = reader_arr[db_name]
+    writer = sqlite3.connect(db_path + str(db_name) + '.db')
+    cur = writer.cursor()
     while current_iter <= end_iter:
         ret = []
         for page, page_relation in page_relations.items():

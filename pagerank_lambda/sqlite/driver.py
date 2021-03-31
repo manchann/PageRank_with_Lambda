@@ -118,7 +118,7 @@ pagerank_init = 1 / total_page_length
 #     db = db_path + str(db_num) + '.db'
 #     conn = sqlite3.connect(db)
 #     cur = conn.cursor()
-#     cur.execute('pragma journal_mode = WAL;')
+#     cur.execute('pragma journal_mode = DELETE;')
 #     cur.execute('''CREATE TABLE if not exists pagerank(
 #                             page INTEGER NOT NULL PRIMARY KEY,
 #                             iter integer ,
