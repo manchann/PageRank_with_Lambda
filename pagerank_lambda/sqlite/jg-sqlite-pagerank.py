@@ -138,6 +138,8 @@ def lambda_handler(event, context):
     # writer = reader_arr[db_name]
     writer = sqlite3.connect(db_path + str(db_name) + '.db')
     cur = writer.cursor()
+    cur.execute('pragma journal_mode = DELETE;')
+    cur.execute('pragma busy_timeout = 600;')
     while current_iter <= end_iter:
         ret = []
         for page, page_relation in page_relations.items():
