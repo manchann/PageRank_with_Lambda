@@ -118,9 +118,10 @@ for page in total_pages:
         page_relation = ['-1']
     try:
         cur.execute('INSERT pagerank (page,iter,`rank`,relation_length) VALUES(%s,%s,%s,%s)',
-                (page, 0, pagerank_init, len(page_relation)))
+                    (page, 0, pagerank_init, len(page_relation)))
     except:
-        cur.execute('REPLACE pagerank (page,iter,`rank`,relation_length) VALUES(%s,%s,%s,%s)')
+        cur.execute('REPLACE pagerank (page,iter,`rank`,relation_length) VALUES(%s,%s,%s,%s)',
+                    (page, 0, pagerank_init, len(page_relation)))
     print(cur.fetchone())
     conn.commit()
 
