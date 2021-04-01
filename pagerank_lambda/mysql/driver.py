@@ -107,9 +107,9 @@ conn = pymysql.connect(host=host, user=user_name, port=port,
                        passwd=pwd, db=db_name)
 cur = conn.cursor(pymysql.cursors.DictCursor)
 # cur.execute('DROP table pagerank')
-cur.execute(
-    "CREATE TABLE pagerank (page VARCHAR(255) NOT NULL, iter VARCHAR(255) NOT NULL, `rank` VARCHAR(255), `relation_length` VARCHAR(255), primary key(page))"
-)
+# cur.execute(
+#     "CREATE TABLE pagerank (page VARCHAR(255) NOT NULL, iter VARCHAR(255) NOT NULL, `rank` VARCHAR(255), `relation_length` VARCHAR(255), primary key(page))"
+# )
 
 for page in total_pages:
     try:
