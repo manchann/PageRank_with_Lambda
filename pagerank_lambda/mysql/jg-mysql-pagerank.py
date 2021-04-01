@@ -20,7 +20,7 @@ bucket = "jg-pagerank-bucket2"
 
 db_name = 'pagerank'
 host_name = 'jg-mysql'
-host = host_name + ".cluster-c3idypdw48si.us-west-2.rds.amazonaws.com"
+host = "jg-mysql.c3idypdw48si.us-west-2.rds.amazonaws.com"
 port = 3306
 user_name = 'admin'
 pwd = '12345678'
