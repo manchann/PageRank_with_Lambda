@@ -92,12 +92,12 @@ divided_page_num = config["divided_page_num"]
 invoked_lambda_num = config["invoked_lambda_num"]
 
 # 전체 페이지의 개수를 계산합니다.
-# for i in range(invoked_lambda_num + 1):
-#     print(i)
-#     try:
-#         page_relations.update(get_s3_object(bucket, config['relationPrefix'] + str(i) + '.txt'))
-#     except:
-#         pass
+for i in range(invoked_lambda_num + 1):
+    print(i)
+    try:
+        page_relations.update(get_s3_object(bucket, config['relationPrefix'] + str(i) + '.txt'))
+    except:
+        pass
 total_pages = get_s3_object(bucket, config['relationPrefix'] + 'total_page.txt')
 
 total_page_length = len(total_pages)
