@@ -55,13 +55,20 @@ def invoke_lambda(current_iter, end_iter, remain_page, file):
     return True
 
 
-def get_past_pagerank(get_query_arr, reader_arr):
+reader_arr = {}
+
+
+def get_past_pagerank(get_query_arr):
     ret = []
     for idx in range(len(get_query_arr)):
         if get_query_arr[idx] == '0':
             continue
         get_query_arr[idx] = get_query_arr[idx][:len(get_query_arr[idx]) - 4] + ';'
-        reader = sqlite3.connect(db_path + str(idx) + '.db')
+
+        dict_idx = str(idx)
+        if dict_idx not in reader_arr:
+            reader_arr[dict_idx] = sqlite3.connect(db_path + dict_idx + '.db', timeout=900)
+        reader = reader_arr[dict_idx]
         cur = reader.cursor()
         cur.execute(get_query_arr[idx])
         res = cur.fetchall()
@@ -80,7 +87,7 @@ dampen_factor = 0.8
 
 
 # 랭크를 계산합니다.
-def ranking(page_relation, reader_arr):
+def ranking(page_relation):
     rank = 0
 
     get_query_arr = ['0' for i in range(total_divide_num + 1)]
@@ -92,7 +99,7 @@ def ranking(page_relation, reader_arr):
             get_query_arr[db_num] = page_query
         get_query_arr[db_num] += "page=" + page + " OR "
     get_start = time.time()
-    past_pagerank = get_past_pagerank(get_query_arr, reader_arr)
+    past_pagerank = get_past_pagerank(get_query_arr)
     get_time = time.time() - get_start
 
     for page_data in past_pagerank:
@@ -104,9 +111,9 @@ def ranking(page_relation, reader_arr):
 
 
 # 각각 페이지에 대하여 rank를 계산하고 dynamodb에 업데이트 합니다.
-def ranking_each_page(page, page_relation, iter, remain_page, reader_arr):
+def ranking_each_page(page, page_relation, iter, remain_page):
     rank_start = time.time()
-    rank, get_time = ranking(page_relation, reader_arr)
+    rank, get_time = ranking(page_relation)
     page_rank = rank + remain_page
     rank_time = time.time() - rank_start
 
@@ -119,31 +126,24 @@ def ranking_each_page(page, page_relation, iter, remain_page, reader_arr):
 
 
 def lambda_handler(event, context):
+    start = time.time()
     current_iter = event['current_iter']
     end_iter = event['end_iter']
     remain_page = event['remain_page']
     file = event['file']
     page_relations = get_s3_object(bucket, file)
 
-    reader_arr = []
-    # for idx in range(total_divide_num + 1):
-    #     try:
-    #         read_db = db_path + str(idx) + '.db'
-    #         reader = sqlite3.connect(read_db, timeout=600)
-    #         reader_arr.append(reader)
-    #     except:
-    #         pass
     db_name = file.split('/')[2]
     db_name = int(db_name.split('.')[0])
-    # writer = reader_arr[db_name]
-    writer = sqlite3.connect(db_path + str(db_name) + '.db')
-    cur = writer.cursor()
-    cur.execute('pragma journal_mode = DELETE;')
-    cur.execute('pragma busy_timeout = 600;')
+    writer = sqlite3.connect(db_path + str(db_name) + '.db', timeout=900)
+    # cur = writer.cursor()
+    # cur.execute('pragma journal_mode = DELETE;')
+    # cur.execute('pragma busy_timeout = 600;')
     while current_iter <= end_iter:
+        iter_start = time.time()
         ret = []
         for page, page_relation in page_relations.items():
-            ranking_result = ranking_each_page(page, page_relation, current_iter, remain_page, reader_arr)
+            ranking_result = ranking_each_page(page, page_relation, current_iter, remain_page)
             result = (ranking_result['page'], ranking_result['iter'], ranking_result['page_rank'],
                       ranking_result['relation_length'])
             ret.append(result)
@@ -151,7 +151,12 @@ def lambda_handler(event, context):
         put_start = time.time()
         put_efs(ret, writer)
         put_time = time.time() - put_start
-        print(put_time)
+        print({'put_time': put_time,
+               'iter': current_iter,
+               'file': file
+               })
+        print(str(current_iter) + ' 번째 iteration 걸린 시간: ', time.time() - iter_start)
         current_iter += 1
 
+    print('총 걸린 시간:', str(file) + ' 번 람다', str(end_iter) + " 번 작업", time.time() - start)
     return True
