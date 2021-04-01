@@ -19,7 +19,7 @@ lambda_name = 'pagerank'
 bucket = "jg-pagerank-bucket2"
 
 db_name = 'pagerank'
-host_name = 'jg-mysql'
+host_name = 'jg-mysql-pagerank'
 host = host_name + ".cluster-c3idypdw48si.us-west-2.rds.amazonaws.com"
 port = 3306
 user_name = 'admin'
