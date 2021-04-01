@@ -33,7 +33,7 @@ lambda_client = boto3.client('lambda', config=lambda_config)
 
 db_name = 'pagerank'
 host_name = 'jg-mysql-pagerank'
-host = host_name + ".cluster-c3idypdw48si.us-west-2.rds.amazonaws.com"
+host = host_name + '.cluster-c3idypdw48si.us-west-2.rds.amazonaws.com'
 port = 3306
 user_name = 'admin'
 pwd = '12345678'
