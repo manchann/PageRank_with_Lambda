@@ -32,7 +32,7 @@ lambda_config = Config(read_timeout=lambda_read_timeout, max_pool_connections=bo
 lambda_client = boto3.client('lambda', config=lambda_config)
 
 db_name = 'pagerank'
-host_name = 'jg-mysql'
+host_name = 'jg-mysql-pagerank'
 host = host_name + ".cluster-c3idypdw48si.us-west-2.rds.amazonaws.com"
 port = 3306
 user_name = 'admin'
