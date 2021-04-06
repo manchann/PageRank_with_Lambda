@@ -87,48 +87,48 @@ divided_page_num = config["divided_page_num"]
 invoked_lambda_num = config["invoked_lambda_num"]
 # 전체 페이지의 개수를 계산합니다.
 db_path = '/mnt/efs/ap/'
-# for i in range(invoked_lambda_num + 1):
-#     print(i)
-#     try:
-#         db = db_path + str(i) + '.db'
-#         conn = sqlite3.connect(db)
-#         cur = conn.cursor()
-#         cur.execute('''CREATE TABLE if not exists pagerank(
-#                         page INTEGER NOT NULL PRIMARY KEY,
-#                         iter integer ,
-#                         rank real,
-#                         relation_length integer
-#                      )''')
-#         subprocess.call(['sudo', 'chmod', '755', db])
-#         subprocess.call(['sudo', 'chown', '1001:1001', db])
-#         page_relations.update(get_s3_object(bucket, config['relationPrefix'] + str(i) + '.txt'))
-#     except:
-#         pass
+for i in range(invoked_lambda_num + 1):
+    print(i)
+    try:
+        db = db_path + str(i) + '.db'
+        conn = sqlite3.connect(db)
+        cur = conn.cursor()
+        cur.execute('''CREATE TABLE if not exists pagerank(
+                        page INTEGER NOT NULL PRIMARY KEY,
+                        iter integer ,
+                        rank real,
+                        relation_length integer
+                     )''')
+        subprocess.call(['sudo', 'chmod', '755', db])
+        subprocess.call(['sudo', 'chown', '1001:1001', db])
+        page_relations.update(get_s3_object(bucket, config['relationPrefix'] + str(i) + '.txt'))
+    except:
+        pass
 total_pages = get_s3_object(bucket, config['relationPrefix'] + 'total_page.txt')
 #
 total_page_length = len(total_pages)
 pagerank_init = 1 / total_page_length
 
-# for page in total_pages:
-#     try:
-#         page_relation = page_relations[page]
-#     except:
-#         page_relation = ['-1']
-#     db_num = int(page) // divided_page_num
-#     db = db_path + str(db_num) + '.db'
-#     conn = sqlite3.connect(db)
-#     cur = conn.cursor()
-#     cur.execute('pragma journal_mode = DELETE;')
-#     cur.execute('''CREATE TABLE if not exists pagerank(
-#                             page INTEGER NOT NULL PRIMARY KEY,
-#                             iter integer ,
-#                             rank real,
-#                             relation_length integer
-#                          )''')
-#     cur.execute('INSERT OR REPLACE INTO pagerank VALUES (?,?,?,?)',
-#                 (page, 0, pagerank_init, len(page_relation)))
-#     print(page, ' 페이지 진행 중')
-#     conn.commit()
+for page in total_pages:
+    try:
+        page_relation = page_relations[page]
+    except:
+        page_relation = ['-1']
+    db_num = int(page) // divided_page_num
+    db = db_path + str(db_num) + '.db'
+    conn = sqlite3.connect(db)
+    cur = conn.cursor()
+    cur.execute('pragma journal_mode = DELETE;')
+    cur.execute('''CREATE TABLE if not exists pagerank(
+                            page INTEGER NOT NULL PRIMARY KEY,
+                            iter integer ,
+                            rank real,
+                            relation_length integer
+                         )''')
+    cur.execute('INSERT OR REPLACE INTO pagerank VALUES (?,?,?,?)',
+                (page, 0, pagerank_init, len(page_relation)))
+    print(page, ' 페이지 진행 중')
+    conn.commit()
 
 print('init 끝')
 # 모든 page의 초기 Rank값은 1/(전체 페이지 수) 의 값을 가집니다.
@@ -145,7 +145,7 @@ print('pages 분할 개수:', divided_page_num)
 
 # S3의 나뉘어진 파일 수 만큼 람다를 병렬적으로 Invoke합니다.
 t_return = []
-for idx in range(50):
+for idx in range(100):
     s3_file_path = config['relationPrefix'] + str(idx) + '.txt'
     print(idx, '번째 invoking')
     t = Thread(target=invoke_lambda,
