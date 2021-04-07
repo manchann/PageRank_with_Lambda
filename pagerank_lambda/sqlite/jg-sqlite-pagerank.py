@@ -60,9 +60,11 @@ reader_arr = {}
 
 def get_past_pagerank(get_query_arr):
     ret = []
+    get_query_num = 0
     for idx in range(len(get_query_arr)):
         if get_query_arr[idx] == '0':
             continue
+        get_query_num += 1
         get_query_arr[idx] = get_query_arr[idx][:len(get_query_arr[idx]) - 4] + ';'
 
         dict_idx = str(idx)
@@ -73,7 +75,7 @@ def get_past_pagerank(get_query_arr):
         cur.execute(get_query_arr[idx])
         res = cur.fetchall()
         ret += res
-    return ret
+    return ret, get_query_num
 
 
 def put_efs(data, writer):
@@ -99,7 +101,7 @@ def ranking(page_relation):
             get_query_arr[db_num] = page_query
         get_query_arr[db_num] += "page=" + page + " OR "
     get_start = time.time()
-    past_pagerank = get_past_pagerank(get_query_arr)
+    past_pagerank, get_query_num = get_past_pagerank(get_query_arr)
     get_time = time.time() - get_start
 
     for page_data in past_pagerank:
@@ -107,13 +109,13 @@ def ranking(page_relation):
         relation_length = page_data[3]
         rank += (past_rank / relation_length)
     rank *= dampen_factor
-    return rank, get_time
+    return rank, get_time, get_query_num
 
 
 # 각각 페이지에 대하여 rank를 계산하고 dynamodb에 업데이트 합니다.
 def ranking_each_page(page, page_relation, iter, remain_page):
     rank_start = time.time()
-    rank, get_time = ranking(page_relation)
+    rank, get_time, get_query_num = ranking(page_relation)
     page_rank = rank + remain_page
     rank_time = time.time() - rank_start
 
@@ -122,7 +124,8 @@ def ranking_each_page(page, page_relation, iter, remain_page):
             'get_time': get_time,
             'rank_time': rank_time,
             'page_rank': page_rank,
-            'relation_length': len(page_relation)}
+            'relation_length': len(page_relation),
+            'get_query_num': get_query_num}
 
 
 def lambda_handler(event, context):
@@ -153,10 +156,10 @@ def lambda_handler(event, context):
         put_time = time.time() - put_start
         print({'put_time': put_time,
                'iter': current_iter,
-               'file': file
+               'file': file,
+               'execution_time': time.time() - iter_start
                })
-        print(str(current_iter) + ' 번째 iteration 걸린 시간: ', time.time() - iter_start)
         current_iter += 1
-
-    print('총 걸린 시간:', str(file) + ' 번 람다', str(end_iter) + " 번 작업", time.time() - start)
+    print({'total_execution_time': time.time() - start,
+           'file': file})
     return True
