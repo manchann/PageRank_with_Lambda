@@ -93,7 +93,10 @@ page_file = page_file.split("\n")
 page_file.sort(key=sort_by_destination)
 # page의 관계들이 담겨있는 파일을 가지고 dictionary 관계 데이터셋을 만듭니다.
 thread_list = []
-last_destination = page_file[-1].split("\t")[1].replace("\r", "")
+try:
+    last_destination = page_file[-1].split("\t")[1].replace("\r", "")
+except:
+    pass
 print('last_destination: ', last_destination)
 loop = int(last_destination) / (divided_page_num * 10)
 loop = int(loop)
