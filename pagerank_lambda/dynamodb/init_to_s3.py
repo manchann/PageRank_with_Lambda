@@ -96,7 +96,7 @@ thread_list = []
 try:
     last_destination = page_file[-1].split("\t")[1].replace("\r", "")
 except:
-    pass
+    last_destination = page_file[-1].split("\t")[1]
 print('last_destination: ', last_destination)
 loop = int(last_destination) / (divided_page_num * 10)
 loop = int(loop)
