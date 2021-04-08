@@ -160,6 +160,9 @@ def lambda_handler(event, context):
                'execution_time': time.time() - iter_start
                })
         current_iter += 1
+
+    for db in reader_arr:
+        print({'reader': db})
     print({'total_execution_time': time.time() - start,
            'file': file})
     return True
