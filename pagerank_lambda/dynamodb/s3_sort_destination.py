@@ -91,5 +91,6 @@ page_file = page_file.split("\n")
 #     if len(page_file[idx]) == 0:
 #         del page_file[idx]
 page_file.sort(key=sort_by_destination)
+print(page_file)
 
 write_to_s3(bucket, 'bigdata-destination.txt', json.dumps(page_file), {})
