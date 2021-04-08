@@ -93,7 +93,7 @@ page_file = page_file.split("\n")
 page_file.sort(key=sort_by_destination)
 # page의 관계들이 담겨있는 파일을 가지고 dictionary 관계 데이터셋을 만듭니다.
 thread_list = []
-print(page_file[-1])
+print(page_file[0])
 try:
     last_destination = page_file[-1].split("\t")[1].replace("\r", "")
 except:
