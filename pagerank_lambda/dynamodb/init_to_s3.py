@@ -95,9 +95,9 @@ page_file.sort(key=sort_by_destination)
 thread_list = []
 print(page_file[0][-1])
 try:
-    last_destination = page_file[-1].split("\t")[1].replace("\r", "")
+    last_destination = page_file[0][-1].split("\t")[1].replace("\r", "")
 except:
-    last_destination = page_file[-1].split("\t")[1]
+    last_destination = page_file[0][-1].split("\t")[1]
 print('last_destination: ', last_destination)
 loop = int(last_destination) / (divided_page_num * 10)
 loop = int(loop)
