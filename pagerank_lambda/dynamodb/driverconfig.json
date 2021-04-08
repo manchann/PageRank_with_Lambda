@@ -1,7 +1,7 @@
 {
   "bucket": "jg-pagerank-bucket2",
   "prefix": "/",
-  "pages": "bigdata-input-1.txt",
+  "pages": "bigdata-destination.txt",
   "jobBucket": "jg-pagerank-bucket2",
   "relationPrefix": "relation/light/",
   "region": "us-west-2",
