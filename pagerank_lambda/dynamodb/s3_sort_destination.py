@@ -91,10 +91,5 @@ page_file = page_file.split("\n")
 #     if len(page_file[idx]) == 0:
 #         del page_file[idx]
 page_file.sort(key=sort_by_destination)
-# page의 관계들이 담겨있는 파일을 가지고 dictionary 관계 데이터셋을 만듭니다.
-thread_list = []
-last_destination = page_file[-1].split("\t")[1].replace("\r", "")
-print('last_destination: ', last_destination)
 
-
-write_to_s3(bucket,  'bigdata-destination.txt', json.dumps(total_pages), {})
+write_to_s3(bucket, 'bigdata-destination.txt', json.dumps(page_file), {})
