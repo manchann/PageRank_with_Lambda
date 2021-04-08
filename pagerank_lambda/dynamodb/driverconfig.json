@@ -3,7 +3,7 @@
   "prefix": "/",
   "pages": "bigdata-destination.txt",
   "jobBucket": "jg-pagerank-bucket2",
-  "relationPrefix": "relation/light/",
+  "relationPrefix": "relation/light2/",
   "region": "us-west-2",
   "lambdaMemory": 512,
   "concurrentLambdas": 1000,
