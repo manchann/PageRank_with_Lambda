@@ -1,5 +1,5 @@
 {
-  "bucket": "jg-pagerank-bucket",
+  "bucket": "jg-pagerank-bucket2",
   "prefix": "/",
   "pages": "bigdata-input-1.txt",
   "jobBucket": "jg-pagerank-bucket2",
