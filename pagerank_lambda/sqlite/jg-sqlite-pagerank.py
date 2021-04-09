@@ -61,13 +61,11 @@ reader_arr = {}
 def get_past_pagerank(get_query_arr):
     ret = []
     get_query_num = 0
-    for idx in range(len(get_query_arr)):
-        if get_query_arr[idx] == '0':
-            continue
+    for idx in get_query_arr:
         get_query_num += 1
         get_query_arr[idx] = get_query_arr[idx][:len(get_query_arr[idx]) - 4] + ';'
 
-        dict_idx = str(idx)
+        dict_idx = idx
         if dict_idx not in reader_arr:
             reader_arr[dict_idx] = sqlite3.connect(db_path + dict_idx + '.db', timeout=900)
         reader = reader_arr[dict_idx]
@@ -92,12 +90,12 @@ dampen_factor = 0.8
 def ranking(page_relation):
     rank = 0
 
-    get_query_arr = ['0' for i in range(total_divide_num + 1)]
+    get_query_arr = {}
     page_query = "SELECT * FROM pagerank Where "
     for page in page_relation:
         # dynamodb에 올려져 있는 해당 페이지의 rank를 가져옵니다.
-        db_num = int(page) // 1000
-        if get_query_arr[db_num] == '0':
+        db_num = str(int(page) % total_divide_num)
+        if db_num not in get_query_arr:
             get_query_arr[db_num] = page_query
         get_query_arr[db_num] += "page=" + page + " OR "
     get_start = time.time()
