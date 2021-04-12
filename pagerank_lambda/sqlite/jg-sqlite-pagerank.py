@@ -57,23 +57,20 @@ def invoke_lambda(current_iter, end_iter, remain_page, file):
 
 reader_arr = {}
 
+past_pagerank_arr = []
 
-def get_past_pagerank(get_query_arr):
-    ret = []
-    get_query_num = 0
-    for idx in get_query_arr:
-        get_query_num += 1
-        get_query_arr[idx] = get_query_arr[idx][:len(get_query_arr[idx]) - 4] + ';'
 
-        dict_idx = idx
-        if dict_idx not in reader_arr:
-            reader_arr[dict_idx] = sqlite3.connect(db_path + dict_idx + '.db', timeout=900)
-        reader = reader_arr[dict_idx]
-        cur = reader.cursor()
-        cur.execute(get_query_arr[idx])
-        res = cur.fetchall()
-        ret += res
-    return ret, get_query_num
+def get_past_pagerank(get_query_arr, node):
+    get_query_arr[node] = get_query_arr[node][:len(get_query_arr[node]) - 4] + ';'
+
+    if node not in reader_arr:
+        reader_arr[node] = sqlite3.connect(db_path + node + '.db', timeout=900, check_same_thread=False)
+    reader = reader_arr[node]
+    cur = reader.cursor()
+    cur.execute(get_query_arr[node])
+    ret = cur.fetchall()
+    past_pagerank_arr.extend(ret)
+    return past_pagerank_arr
 
 
 def put_efs(data, writer):
@@ -98,14 +95,24 @@ def ranking(page_relation):
         if db_num not in get_query_arr:
             get_query_arr[db_num] = page_query
         get_query_arr[db_num] += "page=" + page + " OR "
-    get_start = time.time()
-    past_pagerank, get_query_num = get_past_pagerank(get_query_arr)
-    get_time = time.time() - get_start
 
-    for page_data in past_pagerank:
+    get_start = time.time()
+
+    get_query_num = len(get_query_arr)
+    t_return = []
+    for node in get_query_arr:
+        t = Thread(target=get_past_pagerank,
+                   args=(get_query_arr, node))
+        t.start()
+        t_return.append(t)
+    for t in t_return:
+        t.join()
+    get_time = time.time() - get_start
+    for page_data in past_pagerank_arr:
         past_rank = page_data[2]
         relation_length = page_data[3]
         rank += (past_rank / relation_length)
+
     rank *= dampen_factor
     return rank, get_time, get_query_num
 
@@ -136,7 +143,7 @@ def lambda_handler(event, context):
 
     db_name = file.split('/')[2]
     db_name = int(db_name.split('.')[0])
-    writer = sqlite3.connect(db_path + str(db_name) + '.db', timeout=900)
+    writer = sqlite3.connect(db_path + str(db_name) + '.db', timeout=900, check_same_thread=False)
     # cur = writer.cursor()
     # cur.execute('pragma journal_mode = DELETE;')
     # cur.execute('pragma busy_timeout = 600;')
