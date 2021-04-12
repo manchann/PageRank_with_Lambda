@@ -135,7 +135,7 @@ print('init 끝')
 # 앞서 zip으로 만든 파일이 Lambda에 업로드 되었으므로 로컬에서의 zip파일을 삭제합니다.
 # removeZip(lambda_zip)
 # 반복 횟수를 설정합니다.
-end_iter = 10
+end_iter = 2
 dampen_factor = 0.8
 remain_page = (1 - dampen_factor) / total_page_length
 
@@ -144,7 +144,7 @@ print('pages 분할 개수:', divided_page_num)
 
 # S3의 나뉘어진 파일 수 만큼 람다를 병렬적으로 Invoke합니다.
 t_return = []
-for idx in range(10):
+for idx in range(1000):
     s3_file_path = config['relationPrefix'] + str(idx) + '.txt'
     print(idx, '번째 invoking')
     t = Thread(target=invoke_lambda,
