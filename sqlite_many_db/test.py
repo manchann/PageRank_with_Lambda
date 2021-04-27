@@ -19,17 +19,16 @@ def put(db):
     db = db_path + db
     conn = sqlite3.connect(db)
     cur = conn.cursor()
-    cur.execute('drop table test')
     cur.execute('''CREATE TABLE if not exists test(
                              name TEXT NOT NULL PRIMARY KEY
                           )''')
 
     name = str(time.time())
-    print(name)
     cur.execute('INSERT OR REPLACE INTO test VALUES (?)', (name,))
     conn.commit()
 
 
+start = time.time()
 t_return = []
 for idx in range(2):
     t = Thread(target=put, args=(str(idx),))
@@ -37,3 +36,5 @@ for idx in range(2):
     t_return.append(t)
 for t in t_return:
     t.join()
+
+print('총 걸린 시간: ', time.time() - start)
