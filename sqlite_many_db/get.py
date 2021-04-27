@@ -12,7 +12,7 @@ import fcntl
 import sqlite3
 import sys
 
-thread_count = int(sys.argv[1])
+# thread_count = int(sys.argv[1])
 
 db_name = 'test.db'
 db_path = '/mnt/efs/ap/'
