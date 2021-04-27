@@ -10,6 +10,9 @@ from boto3.dynamodb.types import DYNAMODB_CONTEXT
 from threading import Thread
 import fcntl
 import sqlite3
+import sys
+
+thread_count = int(sys.argv[1])
 
 db_name = 'test.db'
 db_path = '/mnt/efs/ap/'
@@ -30,7 +33,7 @@ def put(db):
 
 start = time.time()
 t_return = []
-for idx in range(2):
+for idx in range(thread_count):
     t = Thread(target=put, args=(str(idx),))
     t.start()
     t_return.append(t)
@@ -38,3 +41,4 @@ for t in t_return:
     t.join()
 
 print('총 걸린 시간: ', time.time() - start)
+print('쓰레드 개수: ', thread_count)
