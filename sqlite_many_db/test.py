@@ -19,7 +19,7 @@ def put(db):
     db = db_path + db
     conn = sqlite3.connect(db)
     cur = conn.cursor()
-
+    cur.execute('drop table test')
     cur.execute('''CREATE TABLE if not exists test(
                              name TEXT NOT NULL PRIMARY KEY
                           )''')
