@@ -28,6 +28,7 @@ def get(write):
                               )''')
 
         cur.execute('SELECT * FROM test')
+        conn.close()
     writer = db_path + str(write) + '.db'
     conn = sqlite3.connect(writer, timeout=900, check_same_thread=False)
     cur = conn.cursor()
