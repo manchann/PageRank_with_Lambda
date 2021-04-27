@@ -21,7 +21,7 @@ def put(db):
     cur = conn.cursor()
 
     cur.execute('''CREATE TABLE if not exists test(
-                             name INTEGER NOT NULL PRIMARY KEY,
+                             name INTEGER NOT NULL PRIMARY KEY
                           )''')
 
     name = str(time.time())
