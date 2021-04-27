@@ -15,7 +15,7 @@ db_name = 'test.db'
 db_path = '/mnt/efs/ap/'
 
 
-def write(db):
+def put(db):
     db = db_path + db
     conn = sqlite3.connect(db)
     cur = conn.cursor()
@@ -31,7 +31,7 @@ def write(db):
 
 t_return = []
 for idx in range(2):
-    t = Thread(target=write, args=idx)
+    t = Thread(target=put, args=(idx,))
     t.start()
     t_return.append(t)
 for t in t_return:
