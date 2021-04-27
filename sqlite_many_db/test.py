@@ -40,5 +40,5 @@ for idx in range(thread_count):
 for t in t_return:
     t.join()
 
-print('총 걸린 시간: ', time.time() - start)
-print('쓰레드 개수: ', thread_count)
+print(thread_count)
+print(time.time() - start)
