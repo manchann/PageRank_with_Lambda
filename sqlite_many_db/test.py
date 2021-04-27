@@ -32,7 +32,7 @@ def put(db):
 
 
 t_return = []
-for thread_count in range(1, 20):
+for thread_count in range(1, 201):
     start = time.time()
     for idx in range(thread_count):
         t = Thread(target=put, args=(str(idx),))
@@ -41,5 +41,5 @@ for thread_count in range(1, 20):
     for t in t_return:
         t.join()
     print(time.time() - start)
-    print('-------------------------- ' + str(thread_count) + ' ----------------------------')
+    # print('-------------------------- ' + str(thread_count) + ' ----------------------------')
     time.sleep(1)
