@@ -18,7 +18,7 @@ db_name = 'test.db'
 db_path = '/mnt/efs/ap/'
 
 
-def get(test):
+def get(write):
     for db in range(20):
         db = db_path + str(db) + '.db'
         conn = sqlite3.connect(db, timeout=900, check_same_thread=False)
@@ -28,6 +28,16 @@ def get(test):
                               )''')
 
         cur.execute('SELECT * FROM test')
+    writer = db_path + str(write) + '.db'
+    conn = sqlite3.connect(writer, timeout=900, check_same_thread=False)
+    cur = conn.cursor()
+    cur.execute('''CREATE TABLE if not exists test(
+                                     name TEXT NOT NULL PRIMARY KEY
+                                  )''')
+
+    name = str(time.time())
+    cur.execute('INSERT OR REPLACE INTO test VALUES (?)', (name,))
+    conn.commit()
 
 
 t_return = []
