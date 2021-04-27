@@ -26,7 +26,7 @@ def put(db):
 
     name = str(time.time())
     print(name)
-    cur.execute('INSERT OR REPLACE INTO test VALUES (?)', (name))
+    cur.execute('INSERT OR REPLACE INTO test VALUES (?)', (name,))
     conn.commit()
 
 
