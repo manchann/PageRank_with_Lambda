@@ -19,7 +19,7 @@ db_path = '/mnt/efs/ap/'
 
 
 def put(db):
-    db = db_path + db
+    db = db_path + db + '.db'
     conn = sqlite3.connect(db)
     cur = conn.cursor()
     cur.execute('''CREATE TABLE if not exists test(
