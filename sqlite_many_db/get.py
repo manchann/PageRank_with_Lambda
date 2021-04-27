@@ -18,19 +18,20 @@ db_name = 'test.db'
 db_path = '/mnt/efs/ap/'
 
 
-def get(db):
-    db = db_path + db + '.db'
-    conn = sqlite3.connect(db, timeout=900, check_same_thread=False)
-    cur = conn.cursor()
-    cur.execute('''CREATE TABLE if not exists test(
-                             name TEXT NOT NULL PRIMARY KEY
-                          )''')
+def get(test):
+    for db in range(1, 11):
+        db = db_path + str(db) + '.db'
+        conn = sqlite3.connect(db, timeout=900, check_same_thread=False)
+        cur = conn.cursor()
+        cur.execute('''CREATE TABLE if not exists test(
+                                 name TEXT NOT NULL PRIMARY KEY
+                              )''')
 
-    cur.execute('SELECT * FROM test')
+        cur.execute('SELECT * FROM test')
 
 
 t_return = []
-for thread_count in range(1, 21):
+for thread_count in range(11):
     start = time.time()
     for idx in range(thread_count):
         t = Thread(target=get, args=(str(idx),))
