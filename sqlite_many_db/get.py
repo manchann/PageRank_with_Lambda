@@ -12,7 +12,7 @@ import fcntl
 import sqlite3
 import sys
 
-# thread_count = int(sys.argv[1])
+thread_count = int(sys.argv[1])
 
 db_name = 'test.db'
 db_path = '/mnt/efs/ap/'
@@ -29,8 +29,8 @@ def get(test):
 
         cur.execute('SELECT * FROM test')
 
-t_return = []
 for thread_count in range(21):
+    t_return = []
     start = time.time()
     for idx in range(thread_count):
         t = Thread(target=get, args=(str(idx),))
