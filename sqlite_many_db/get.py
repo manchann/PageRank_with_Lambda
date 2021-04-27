@@ -28,7 +28,7 @@ def get(test):
                               )''')
 
         cur.execute('SELECT * FROM test')
-
+        print(cur.fetchall())
 
 t_return = []
 for thread_count in range(21):
