@@ -20,7 +20,7 @@ db_path = '/mnt/efs/ap/'
 
 def get(db):
     db = db_path + db
-    conn = sqlite3.connect(db)
+    conn = sqlite3.connect(db, timeout=900, check_same_thread=False)
     cur = conn.cursor()
     cur.execute('''CREATE TABLE if not exists test(
                              name TEXT NOT NULL PRIMARY KEY
