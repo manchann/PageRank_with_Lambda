@@ -31,7 +31,7 @@ def put(db):
 
 t_return = []
 for idx in range(2):
-    t = Thread(target=put, args=(idx,))
+    t = Thread(target=put, args=(str(idx),))
     t.start()
     t_return.append(t)
 for t in t_return:
