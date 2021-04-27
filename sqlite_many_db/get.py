@@ -26,7 +26,7 @@ def get(db):
                              name TEXT NOT NULL PRIMARY KEY
                           )''')
 
-    cur.execute('SELECT * FROM pagerank')
+    cur.execute('SELECT * FROM test')
 
 
 t_return = []
