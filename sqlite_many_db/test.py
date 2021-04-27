@@ -12,7 +12,7 @@ import fcntl
 import sqlite3
 import sys
 
-thread_count = int(sys.argv[1])
+# thread_count = int(sys.argv[1])
 
 db_name = 'test.db'
 db_path = '/mnt/efs/ap/'
@@ -31,14 +31,15 @@ def put(db):
     conn.commit()
 
 
-start = time.time()
 t_return = []
-for idx in range(thread_count):
-    t = Thread(target=put, args=(str(idx),))
-    t.start()
-    t_return.append(t)
-for t in t_return:
-    t.join()
-
-print(thread_count)
-print(time.time() - start)
+for thread_count in range(1, 20):
+    start = time.time()
+    for idx in range(thread_count):
+        t = Thread(target=put, args=(str(idx),))
+        t.start()
+        t_return.append(t)
+    for t in t_return:
+        t.join()
+    print(time.time() - start)
+    print('-------------------------- ' + str(thread_count) + ' ----------------------------')
+    time.sleep(1)
